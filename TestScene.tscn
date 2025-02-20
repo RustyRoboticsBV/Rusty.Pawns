@@ -1,0 +1,37 @@
+[gd_scene load_steps=7 format=3 uid="uid://dg5kpfr8pw6o0"]
+
+[ext_resource type="Script" path="res://Scripts/Core/Pawn/Pawn.cs" id="1_sbopx"]
+[ext_resource type="Script" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_vpolg"]
+[ext_resource type="Script" path="res://Scripts/Core/Raycasters/RaycastBox.cs" id="2_n2nbt"]
+[ext_resource type="Script" path="res://Scripts/BasicActions/WalkAction.cs" id="3_xn88x"]
+[ext_resource type="Script" path="res://Scripts/BasicActions/WalkProperties.cs" id="4_x7m63"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ag5q4"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.58269)
+
+[node name="SimplePlayerController" type="Node3D" parent="." node_paths=PackedStringArray("Pawn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.58269)
+script = ExtResource("1_vpolg")
+Pawn = NodePath("Pawn")
+
+[node name="Pawn" type="Node3D" parent="SimplePlayerController" node_paths=PackedStringArray("MovementTargetNode")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.58269)
+script = ExtResource("1_sbopx")
+MovementTargetNode = NodePath("..")
+
+[node name="RaycastBox" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("2_n2nbt")
+
+[node name="WalkAction" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("3_xn88x")
+
+[node name="WalkProperties" type="Node3D" parent="SimplePlayerController/Pawn/WalkAction"]
+script = ExtResource("4_x7m63")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController/Pawn"]
+mesh = SubResource("BoxMesh_ag5q4")
+skeleton = NodePath("../../..")
