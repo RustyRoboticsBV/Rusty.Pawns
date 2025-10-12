@@ -16,13 +16,10 @@ namespace Rusty.Pawns
 
         public Pawn Pawn { get; private set; }
         public List<PawnComponent> Children { get; private set; }
-        public List<Raycaster> Raycasters { get; private set; }
         public List<Condition> Conditions { get; private set; }
-        public List<Trigger> Triggers { get; private set; }
-        public List<StateMachine> StateMachines { get; private set; }
+        public List<Raycaster> Raycasters { get; private set; }
         public List<ActionProperties> Properties { get; private set; }
         public List<Action> Actions { get; private set; }
-        public List<Modifier> Modifiers { get; private set; }
 
         /* Godot overrides. */
         public sealed override void _EnterTree() { }
@@ -55,11 +52,8 @@ namespace Rusty.Pawns
             Children = new();
             Conditions = new();
             Raycasters = new();
-            Triggers = new();
-            StateMachines = new();
             Properties = new();
             Actions = new();
-            Modifiers = new();
             GetChildren(this, pawn);
 
             OnInit(pawn);
@@ -84,16 +78,10 @@ namespace Rusty.Pawns
                         Conditions.Add(condition);
                     if (child is Raycaster raycaster)
                         Raycasters.Add(raycaster);
-                    if (child is Trigger trigger)
-                        Triggers.Add(trigger);
-                    if (child is StateMachine stateMachine)
-                        StateMachines.Add(stateMachine);
                     if (child is ActionProperties properties)
                         Properties.Add(properties);
                     if (child is Action action)
                         Actions.Add(action);
-                    if (child is Modifier modifier)
-                        Modifiers.Add(modifier);
                     child.Init(pawn);
                 }
                 else

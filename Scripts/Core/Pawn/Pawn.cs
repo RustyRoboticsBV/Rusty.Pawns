@@ -51,11 +51,7 @@ namespace Rusty.Pawns
         // Children.
         public PawnChildList<Condition> Conditions { get; private set; }
         public PawnChildList<Raycaster> Raycasters { get; private set; }
-        public PawnChildList<Trigger> Triggers { get; private set; }
-        public PawnChildList<StateMachine> StateMachines { get; private set; }
-        public PawnChildList<ActionProperties> Properties { get; private set; }
         public PawnChildList<Action> Actions { get; private set; }
-        public PawnChildList<Modifier> Modifiers { get; private set; }
 
         public Raycaster ActiveRaycaster { get; private set; }
 
@@ -91,12 +87,12 @@ namespace Rusty.Pawns
         /* Public methods. */
         /// <summary>
         /// Instantly try to move some distance along the x and y axes, being stopped by physics bodies that happen to be in the
-        /// way. Updates surroundings before moving, and climbs and descends slopes.
+        /// way.
         /// </summary>
-        public void TryMove(float x, float y)
+        public void TryMove(float x, float y, bool climbSlopes = true, bool descendSlopes = true)
         {
             UpdateSurroundings();
-            DoMove(new Vector2(x, y), true, true);
+            DoMove(new(x, y), climbSlopes, descendSlopes);
         }
 
         /* Godot overrides. */
@@ -114,19 +110,11 @@ namespace Rusty.Pawns
             // Get all discoverable pawn children.
             Conditions = new(this, true);
             Raycasters = new(this, true);
-            Triggers = new(this, true);
-            StateMachines = new(this, true);
-            Properties = new(this, true);
             Actions = new(this, true);
-            Modifiers = new(this, true);
 
             Conditions.CreateFromNodeTree(this);
             Raycasters.CreateFromNodeTree(this);
-            Triggers.CreateFromNodeTree(this);
-            StateMachines.CreateFromNodeTree(this);
             Actions.CreateFromNodeTree(this);
-            Properties.CreateFromNodeTree(this);
-            Modifiers.CreateFromNodeTree(this);
 
             // Call initialize methods.
             for (int i = 0; i < GetChildCount(); i++)
@@ -152,16 +140,6 @@ namespace Rusty.Pawns
             for (int i = 0; i < SubSteps; i++)
             {
                 // Update action properties.
-                foreach (Trigger trigger in Triggers)
-                {
-                    if (trigger.CheckActive(this))
-                        trigger.PreUpdateProperties(subDeltaTime, this);
-                }
-                foreach (StateMachine stateMachine in StateMachines)
-                {
-                    if (stateMachine.CheckActive(this))
-                        stateMachine.PreUpdateProperties(subDeltaTime, this);
-                }
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
@@ -178,18 +156,8 @@ namespace Rusty.Pawns
                     else
                         action.ForceStop();
                 }
-                foreach (Modifier modifier in Modifiers)
-                {
-                    if (modifier.CheckActive(this))
-                        modifier.PostUpdateProperties(subDeltaTime, this);
-                }
 
                 // Update speed.
-                foreach (StateMachine stateMachine in StateMachines)
-                {
-                    if (stateMachine.CheckActive(this))
-                        stateMachine.PreUpdateSpeed(subDeltaTime, this);
-                }
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
@@ -197,18 +165,8 @@ namespace Rusty.Pawns
                     else
                         action.ForceStop();
                 }
-                foreach (Modifier modifier in Modifiers)
-                {
-                    if (modifier.CheckActive(this))
-                        modifier.PostUpdateSpeed(subDeltaTime, this);
-                }
 
                 // Update movement.
-                foreach (StateMachine stateMachine in StateMachines)
-                {
-                    if (stateMachine.CheckActive(this))
-                        stateMachine.PreUpdateMovement(subDeltaTime, this);
-                }
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
@@ -216,29 +174,14 @@ namespace Rusty.Pawns
                     else
                         action.ForceStop();
                 }
-                foreach (Modifier modifier in Modifiers)
-                {
-                    if (modifier.CheckActive(this))
-                        modifier.PostUpdateMovement(subDeltaTime, this);
-                }
 
                 // Update face direction.
-                foreach (StateMachine stateMachine in StateMachines)
-                {
-                    if (stateMachine.CheckActive(this))
-                        stateMachine.PreUpdateFaceDirection(subDeltaTime, this);
-                }
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
                         action.UpdateFaceDirection(subDeltaTime, this);
                     else
                         action.ForceStop();
-                }
-                foreach (Modifier modifier in Modifiers)
-                {
-                    if (modifier.CheckActive(this))
-                        modifier.PostUpdateFaceDirection(subDeltaTime, this);
                 }
 
                 // Apply each action.
