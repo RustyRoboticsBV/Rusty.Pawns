@@ -1,429 +1,470 @@
 using Godot;
 
-namespace Rusty.Pawns
+namespace Rusty.Pawns;
+
+/// <summary>
+/// The top-layer node for character controllers.
+/// </summary>
+[GlobalClass]
+[Icon("./Pawn.svg")]
+public partial class Pawn : Node3D
 {
+    /* Public properties. */
     /// <summary>
-    /// The top-layer node for character controllers.
+    /// When set, the pawn will not move itself, but another Node3D. Generally, you want this to be an ancestor node of the
+    /// pawn. Leave this unset if you want the pawn to move itself.
     /// </summary>
-    [GlobalClass]
-    [Icon("./Pawn.svg")]
-    public partial class Pawn : Node3D
+    [Export] public Node3D MovementTargetNode { get; set; }
+    /// <summary>
+    /// The maximum angle at which surfaces below the pawn are considered to be slopes (instead of steep ground).
+    /// Set this value to 0 if you don't want to have any slopes.
+    /// </summary>
+    [Export] public float MaxSlopeAngle { get; set; } = 30f;
+    /// <summary>
+    /// The maximum angle at which surfaces below the pawn are considered to be ground. Surfaces with steeper angles are
+    /// considered to be walls.
+    /// </summary>
+    [Export] public float MaxGroundAngle { get; set; } = 60f;
+    /// <summary>
+    /// The maximum angle at which surfaces above the pawn are considered to be sloped ceilings (instead of steep ceilings).
+    /// Set this value to 0 if you don't want to have any sloped ceilings.
+    /// </summary>
+    [Export] public float MaxCeilingSlopeAngle { get; set; } = 30f;
+    /// <summary>
+    /// The maximum angle at which surfaces above the pawn are considered to be some form of ceiling. Surfaces with steeper
+    /// angles are considered to be walls.
+    /// </summary>
+    [Export] public float MaxCeilingAngle { get; set; } = 60f;
+    /// <summary>
+    /// The distance of the checks that determine the properties of the nearest surface.
+    /// </summary>
+    [Export] public float NearestSurfaceCheckDistance { get; set; } = 1000f;
+    /// <summary>
+    /// The distance at which the nearest surfaces are considered to be adjacent to the pawn.
+    /// </summary>
+    [Export] public float AdjacencyCheckDistance { get; set; } = 0.01f;
+    /// <summary>
+    /// Divides the physics loop into multiple steps. Increases precision, but lowers performance.
+    /// </summary>
+    [Export] public int SubSteps { get; set; } = 1;
+
+    // Children.
+    public PawnChildList<Condition> Conditions { get; private set; }
+    public PawnChildList<Raycaster> Raycasters { get; private set; }
+    public PawnChildList<Action> Actions { get; private set; }
+
+    public Raycaster ActiveRaycaster { get; private set; }
+
+    // Face direction.
+    public bool IsFacingUp { get; set; } = true;
+    public bool IsFacingDown
     {
-        /* Public properties. */
-        /// <summary>
-        /// When set, the pawn will not move itself, but another Node3D. Generally, you want this to be an ancestor node of the
-        /// pawn. Leave this unset if you want the pawn to move itself.
-        /// </summary>
-        [Export] public Node3D MovementTargetNode { get; set; }
-        /// <summary>
-        /// The maximum angle at which surfaces below the pawn are considered to be slopes (instead of steep ground).
-        /// Set this value to 0 if you don't want to have any slopes.
-        /// </summary>
-        [Export] public float MaxSlopeAngle { get; set; } = 30f;
-        /// <summary>
-        /// The maximum angle at which surfaces below the pawn are considered to be ground. Surfaces with steeper angles are
-        /// considered to be walls.
-        /// </summary>
-        [Export] public float MaxGroundAngle { get; set; } = 60f;
-        /// <summary>
-        /// The maximum angle at which surfaces above the pawn are considered to be sloped ceilings (instead of steep ceilings).
-        /// Set this value to 0 if you don't want to have any sloped ceilings.
-        /// </summary>
-        [Export] public float MaxCeilingSlopeAngle { get; set; } = 30f;
-        /// <summary>
-        /// The maximum angle at which surfaces above the pawn are considered to be some form of ceiling. Surfaces with steeper
-        /// angles are considered to be walls.
-        /// </summary>
-        [Export] public float MaxCeilingAngle { get; set; } = 60f;
-        /// <summary>
-        /// The distance of the checks that determine the properties of the nearest surface.
-        /// </summary>
-        [Export] public float NearestSurfaceCheckDistance { get; set; } = 1000f;
-        /// <summary>
-        /// The distance at which the nearest surfaces are considered to be adjacent to the pawn.
-        /// </summary>
-        [Export] public float AdjacencyCheckDistance { get; set; } = 0.01f;
-        /// <summary>
-        /// Divides the physics loop into multiple steps. Increases precision, but lowers performance.
-        /// </summary>
-        [Export] public int SubSteps { get; set; } = 1;
+        get => !IsFacingUp;
+        set => IsFacingUp = !value;
+    }
+    public bool IsFacingRight { get; set; } = true;
+    public bool IsFacingLeft
+    {
+        get => !IsFacingRight;
+        set => IsFacingRight = !value;
+    }
 
-        // Children.
-        public PawnChildList<Condition> Conditions { get; private set; }
-        public PawnChildList<Raycaster> Raycasters { get; private set; }
-        public PawnChildList<Action> Actions { get; private set; }
+    // Surroundings.
+    public NearestSurface ToLeft { get; private set; } = NearestSurface.Nothing;
+    public NearestSurface ToRight { get; private set; } = NearestSurface.Nothing;
+    public NearestSurface Below { get; private set; } = NearestSurface.Nothing;
+    public NearestSurface Above { get; private set; } = NearestSurface.Nothing;
+    public NearestSurface Front => IsFacingRight ? ToRight : ToLeft;
+    public NearestSurface Behind => IsFacingRight ? ToLeft : ToRight;
 
-        public Raycaster ActiveRaycaster { get; private set; }
+    public AdjacentSurface ToLeftAdjacent => ToLeft.IsAdjacent ? ToLeft.Surface : AdjacentSurface.Nothing;
+    public AdjacentSurface ToRightAdjacent => ToRight.IsAdjacent ? ToRight.Surface : AdjacentSurface.Nothing;
+    public AdjacentSurface BelowAdjacent => Below.IsAdjacent ? Below.Surface : AdjacentSurface.Nothing;
+    public AdjacentSurface AboveAdjacent => Above.IsAdjacent ? Above.Surface : AdjacentSurface.Nothing;
+    public AdjacentSurface FrontAdjacent => IsFacingRight ? ToRightAdjacent : ToLeftAdjacent;
+    public AdjacentSurface BehindAdjacent => IsFacingRight ? ToLeftAdjacent : ToRightAdjacent;
 
-        // Face direction.
-        public bool IsFacingUp { get; set; } = true;
-        public bool IsFacingDown
+    /* Public methods. */
+    /// <summary>
+    /// Instantly try to move some distance along the x and y axes, being stopped by physics bodies that happen to be in the
+    /// way.
+    /// </summary>
+    public void TryMove(float x, float y, bool climbSlopes = true, bool descendSlopes = true)
+    {
+        UpdateSurroundings();
+        DoMove(new(x, y), climbSlopes, descendSlopes);
+    }
+
+    /* Godot overrides. */
+    public override void _EnterTree()
+    {
+        // Make sure that the number of sub-steps has an allowed value.
+        if (SubSteps < 1)
+            SubSteps = 1;
+        else if (SubSteps > 8)
+            SubSteps = 8;
+    }
+
+    public override void _Ready()
+    {
+        // Get all discoverable pawn children.
+        Conditions = new(this, true);
+        Raycasters = new(this, true);
+        Actions = new(this, true);
+
+        Conditions.CreateFromNodeTree(this);
+        Raycasters.CreateFromNodeTree(this);
+        Actions.CreateFromNodeTree(this);
+
+        // Call initialize methods.
+        for (int i = 0; i < GetChildCount(); i++)
         {
-            get => !IsFacingUp;
-            set => IsFacingUp = !value;
-        }
-        public bool IsFacingRight { get; set; } = true;
-        public bool IsFacingLeft
-        {
-            get => !IsFacingRight;
-            set => IsFacingRight = !value;
-        }
-
-        // Surroundings.
-        public NearestSurface ToLeft { get; private set; } = NearestSurface.Nothing;
-        public NearestSurface ToRight { get; private set; } = NearestSurface.Nothing;
-        public NearestSurface Below { get; private set; } = NearestSurface.Nothing;
-        public NearestSurface Above { get; private set; } = NearestSurface.Nothing;
-        public NearestSurface Front => IsFacingRight ? ToRight : ToLeft;
-        public NearestSurface Behind => IsFacingRight ? ToLeft : ToRight;
-
-        public AdjacentSurface ToLeftAdjacent => ToLeft.IsAdjacent ? ToLeft.Surface : AdjacentSurface.Nothing;
-        public AdjacentSurface ToRightAdjacent => ToRight.IsAdjacent ? ToRight.Surface : AdjacentSurface.Nothing;
-        public AdjacentSurface BelowAdjacent => Below.IsAdjacent ? Below.Surface : AdjacentSurface.Nothing;
-        public AdjacentSurface AboveAdjacent => Above.IsAdjacent ? Above.Surface : AdjacentSurface.Nothing;
-        public AdjacentSurface FrontAdjacent => IsFacingRight ? ToRightAdjacent : ToLeftAdjacent;
-        public AdjacentSurface BehindAdjacent => IsFacingRight ? ToLeftAdjacent : ToRightAdjacent;
-
-        /* Public methods. */
-        /// <summary>
-        /// Instantly try to move some distance along the x and y axes, being stopped by physics bodies that happen to be in the
-        /// way.
-        /// </summary>
-        public void TryMove(float x, float y, bool climbSlopes = true, bool descendSlopes = true)
-        {
-            UpdateSurroundings();
-            DoMove(new(x, y), climbSlopes, descendSlopes);
-        }
-
-        /* Godot overrides. */
-        public override void _EnterTree()
-        {
-            // Make sure that the number of sub-steps has an allowed value.
-            if (SubSteps < 1)
-                SubSteps = 1;
-            else if (SubSteps > 8)
-                SubSteps = 8;
-        }
-
-        public override void _Ready()
-        {
-            // Get all discoverable pawn children.
-            Conditions = new(this, true);
-            Raycasters = new(this, true);
-            Actions = new(this, true);
-
-            Conditions.CreateFromNodeTree(this);
-            Raycasters.CreateFromNodeTree(this);
-            Actions.CreateFromNodeTree(this);
-
-            // Call initialize methods.
-            for (int i = 0; i < GetChildCount(); i++)
+            Node node = GetChild(i);
+            if (node is PawnComponent child)
             {
-                Node node = GetChild(i);
-                if (node is PawnComponent child)
-                {
-                    child.Init(this);
-                }
+                child.Init(this);
             }
         }
+    }
 
-        public override void _PhysicsProcess(double deltaTime)
+    public override void _PhysicsProcess(double deltaTime)
+    {
+        double subDeltaTime = deltaTime / SubSteps;
+
+        // Update active raycaster.
+        ActiveRaycaster = Raycasters.GetFirstActive();
+
+        // Update surroundings (in case objects in the environment moved).
+        UpdateSurroundings();
+
+        for (int i = 0; i < SubSteps; i++)
         {
-            double subDeltaTime = deltaTime / SubSteps;
-
-            // Update active raycaster.
-            ActiveRaycaster = Raycasters.GetFirstActive();
-
-            // Update surroundings (in case objects in the environment moved).
-            UpdateSurroundings();
-
-            for (int i = 0; i < SubSteps; i++)
+            // Before update properties events.
+            foreach (Action action in Actions)
             {
-                // Update actions' properties.
-                foreach (Action action in Actions)
+                if (action.CheckActive(this))
+                    action.BeforeUpdateProperties(deltaTime, this);
+            }
+
+            // Update actions' properties.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
                 {
-                    if (action.CheckActive(this))
+                    if (action is IActionWithProperties withProps)
                     {
-                        if (action is IActionWithProperties withProps)
+                        ActionProperties current = withProps.GetProperties();
+                        withProps.UpdateProperties(subDeltaTime, this);
+                        ActionProperties next = withProps.GetProperties();
+                        if (current != next)
                         {
-                            ActionProperties current = withProps.GetProperties();
-                            withProps.UpdateProperties(subDeltaTime, this);
-                            ActionProperties next = withProps.GetProperties();
-                            if (current != next)
-                            {
-                                current?.OnDeselected(subDeltaTime, this);
-                                next?.OnSelected(subDeltaTime, this);
-                            }
-                        }
-                    }
-                }
-
-                // Update actions' acceleration.
-                foreach (Action action in Actions)
-                {
-                    if (action.CheckActive(this))
-                    {
-                        if (action is MovementAction movement)
-                            movement.UpdateAcceleration(subDeltaTime, this);
-                    }
-                }
-
-                // Update actions' speed.
-                foreach (Action action in Actions)
-                {
-                    if (action.CheckActive(this))
-                    {
-                        if (action is MovementAction movement)
-                            movement.UpdateSpeed(subDeltaTime, this);
-                    }
-                }
-
-                // Update actions' movement.
-                foreach (Action action in Actions)
-                {
-                    if (action.CheckActive(this))
-                    {
-                        if (action is MovementAction movement)
-                            movement.UpdateMovement(subDeltaTime, this);
-                    }
-                }
-
-                // Update actions' face direction.
-                foreach (Action action in Actions)
-                {
-                    if (action.CheckActive(this))
-                    {
-                        if (action is MovementAction movement)
-                            movement.UpdateFaceDirection(subDeltaTime, this);
-                    }
-                }
-
-                // Apply each action.
-                foreach (Action action in Actions)
-                {
-                    if (action.CheckActive(this))
-                    {
-                        if (action is MovementAction movement)
-                        {
-                            DoMove(movement.GetMovement(), true, movement.DescendsSlopes);
-                            ApplyFacing(movement.GetFaceDirection());
+                            current?.OnDeselected(subDeltaTime, this);
+                            next?.OnSelected(subDeltaTime, this);
                         }
                     }
                 }
             }
-        }
 
-        /* Private methods. */
-        private void DoMove(Vector2 movement, bool climbSlopes, bool descendSlopes)
-        {
-            if (movement.X != 0f)
+            // After update properties events.
+            foreach (Action action in Actions)
             {
-                float distance = movement.X;
-                AdjacentSurface front = distance < 0f ? ToLeftAdjacent : ToRightAdjacent;
-
-                // Slope climb.
-                if (climbSlopes && front.IsSlopedGround)
-                    ClimbSlope(distance, front);
-
-                // Slope descend.
-                else if (descendSlopes && (BelowAdjacent.IsSlopedGround || BelowAdjacent.IsSteepGround))
-                    DescendSlope(distance, BelowAdjacent);
-
-                // Sloped ceiling descend.
-                else if (descendSlopes && front.IsSlopedCeiling)
-                    DescendSlopedCeiling(distance, BelowAdjacent);
-
-                // Normal movement.
-                else
-                    TryMoveX(distance);
+                if (action.CheckActive(this))
+                    action.AfterUpdateProperties(deltaTime, this);
             }
 
-            if (movement.Y != 0f)
+            // Update actions' acceleration.
+            foreach (Action action in Actions)
             {
-                float distance = movement.Y;
+                if (action.CheckActive(this))
+                {
+                    if (action is MovementAction movement)
+                        movement.UpdateAcceleration(subDeltaTime, this);
+                }
+            }
 
-                // Sloped wall descend.
-                if (BelowAdjacent.IsDownwardsSlopedWall && distance < 0f)
-                    DescendSlope(distance, BelowAdjacent);
+            // After update acceleration events.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                    action.AfterUpdateAcceleration(deltaTime, this);
+            }
 
-                // Slopes wall upwards.
-                else if (AboveAdjacent.IsUpwardsSlopedWall && distance > 0f)
-                    ClimbSlopedCeiling(distance, AboveAdjacent);
+            // Update actions' speed.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                {
+                    if (action is MovementAction movement)
+                        movement.UpdateSpeed(subDeltaTime, this);
+                }
+            }
 
-                // Normal movement.
-                else
-                    TryMoveY(distance);
+            // After update speed events.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                    action.AfterUpdateSpeed(deltaTime, this);
+            }
+
+            // Update actions' movement.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                {
+                    if (action is MovementAction movement)
+                        movement.UpdateMovement(subDeltaTime, this);
+                }
+            }
+
+            // After update movement events.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                    action.AfterUpdateMovement(deltaTime, this);
+            }
+
+            // Update actions' face direction.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                {
+                    if (action is MovementAction movement)
+                        movement.UpdateFaceDirection(subDeltaTime, this);
+                }
+            }
+
+            // After update face direction events.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                    action.AfterUpdateFaceDirection(deltaTime, this);
+            }
+
+            // Apply each action.
+            foreach (Action action in Actions)
+            {
+                if (action.CheckActive(this))
+                {
+                    if (action is MovementAction movement)
+                    {
+                        DoMove(movement.GetMovement(), true, movement.DescendsSlopes);
+                        ApplyFacing(movement.GetFaceDirection());
+                    }
+                }
             }
         }
+    }
 
-        private void ClimbSlope(float distance, AdjacentSurface surface)
+    /* Private methods. */
+    private void DoMove(Vector2 movement, bool climbSlopes, bool descendSlopes)
+    {
+        if (movement.X != 0f)
         {
-            Vector2 redirected = surface.ParallelUp * Mathf.Abs(distance);
-            TryMoveY(redirected.Y);
-            TryMoveX(redirected.X);
+            float distance = movement.X;
+            AdjacentSurface front = distance < 0f ? ToLeftAdjacent : ToRightAdjacent;
 
-            if (ActiveRaycaster != null)
-            {
-                ShapecastResult result = ActiveRaycaster.CheckDown(redirected.Y);
-                if (result.HasHit)
-                    TryMoveY(-result.HitDistance);
-            }
-        }
+            // Slope climb.
+            if (climbSlopes && front.IsSlopedGround)
+                ClimbSlope(distance, front);
 
-        private void DescendSlope(float distance, AdjacentSurface surface)
-        {
-            Vector2 redirected = surface.ParallelDown * Mathf.Abs(distance);
-            TryMoveX(redirected.X);
-            TryMoveY(redirected.Y);
-        }
+            // Slope descend.
+            else if (descendSlopes && (BelowAdjacent.IsSlopedGround || BelowAdjacent.IsSteepGround))
+                DescendSlope(distance, BelowAdjacent);
 
-        private void ClimbSlopedCeiling(float distance, AdjacentSurface surface)
-        {
-            Vector2 redirected = surface.ParallelUp * distance;
-            TryMoveX(redirected.X);
-            TryMoveY(redirected.Y);
-        }
+            // Sloped ceiling descend.
+            else if (descendSlopes && front.IsSlopedCeiling)
+                DescendSlopedCeiling(distance, BelowAdjacent);
 
-        private void DescendSlopedCeiling(float distance, AdjacentSurface surface)
-        {
-            Vector2 redirected = surface.ParallelDown * distance;
-            TryMoveY(redirected.Y);
-            TryMoveX(redirected.X);
-        }
-
-        private void TryMoveX(float distance)
-        {
-            if (distance == 0f)
-                return;
-
-            if (ActiveRaycaster != null)
-            {
-                ShapecastResult check = ActiveRaycaster.CheckHorizontal(distance);
-                DoMove(check.HitVector);
-            }
+            // Normal movement.
             else
-                DoMove(Vector3.Right * distance);
+                TryMoveX(distance);
         }
 
-        private void TryMoveY(float distance)
+        if (movement.Y != 0f)
         {
-            if (distance == 0f)
-                return;
+            float distance = movement.Y;
 
-            if (ActiveRaycaster != null)
-            {
-                ShapecastResult check = ActiveRaycaster.CheckVertical(distance);
-                DoMove(check.HitVector);
-            }
+            // Sloped wall descend.
+            if (BelowAdjacent.IsDownwardsSlopedWall && distance < 0f)
+                DescendSlope(distance, BelowAdjacent);
+
+            // Slopes wall upwards.
+            else if (AboveAdjacent.IsUpwardsSlopedWall && distance > 0f)
+                ClimbSlopedCeiling(distance, AboveAdjacent);
+
+            // Normal movement.
             else
-                DoMove(Vector3.Up * distance);
+                TryMoveY(distance);
         }
+    }
 
-        private void DoMove(Vector3 movement)
+    private void ClimbSlope(float distance, AdjacentSurface surface)
+    {
+        Vector2 redirected = surface.ParallelUp * Mathf.Abs(distance);
+        TryMoveY(redirected.Y);
+        TryMoveX(redirected.X);
+
+        if (ActiveRaycaster != null)
         {
-            if (MovementTargetNode == null)
-                Translate(movement);
-            else
-                MovementTargetNode.Translate(movement);
+            ShapecastResult result = ActiveRaycaster.CheckDown(redirected.Y);
+            if (result.HasHit)
+                TryMoveY(-result.HitDistance);
         }
+    }
 
+    private void DescendSlope(float distance, AdjacentSurface surface)
+    {
+        Vector2 redirected = surface.ParallelDown * Mathf.Abs(distance);
+        TryMoveX(redirected.X);
+        TryMoveY(redirected.Y);
+    }
 
-        private void ApplyFacing(FaceDirection direction)
+    private void ClimbSlopedCeiling(float distance, AdjacentSurface surface)
+    {
+        Vector2 redirected = surface.ParallelUp * distance;
+        TryMoveX(redirected.X);
+        TryMoveY(redirected.Y);
+    }
+
+    private void DescendSlopedCeiling(float distance, AdjacentSurface surface)
+    {
+        Vector2 redirected = surface.ParallelDown * distance;
+        TryMoveY(redirected.Y);
+        TryMoveX(redirected.X);
+    }
+
+    private void TryMoveX(float distance)
+    {
+        if (distance == 0f)
+            return;
+
+        if (ActiveRaycaster != null)
         {
-            if (direction.X == FaceDirectionX.Left)
-                IsFacingLeft = true;
-            else if (direction.X == FaceDirectionX.Right)
-                IsFacingRight = true;
-
-            if (direction.Y == FaceDirectionY.Down)
-                IsFacingDown = true;
-            else if (direction.Y == FaceDirectionY.Up)
-                IsFacingUp = true;
+            ShapecastResult check = ActiveRaycaster.CheckHorizontal(distance);
+            DoMove(check.HitVector);
         }
+        else
+            DoMove(Vector3.Right * distance);
+    }
 
+    private void TryMoveY(float distance)
+    {
+        if (distance == 0f)
+            return;
 
-        private void UpdateSurroundings()
+        if (ActiveRaycaster != null)
         {
-            // If there is no currently-active raycaster, all surroundings become empty air.
-            if (ActiveRaycaster == null)
-            {
-                ToLeft = NearestSurface.Nothing;
-                ToRight = NearestSurface.Nothing;
-                Above = NearestSurface.Nothing;
-                Below = NearestSurface.Nothing;
-                return;
-            }
-
-            // Left adjacent.
-            ShapecastResult checkLeft = ActiveRaycaster.CheckLeft(NearestSurfaceCheckDistance);
-            ToLeft = GetNearestSurface(checkLeft);
-
-            // Right adjacent.
-            ShapecastResult checkRight = ActiveRaycaster.CheckRight(NearestSurfaceCheckDistance);
-            ToRight = GetNearestSurface(checkRight);
-
-            // Down adjacent.
-            ShapecastResult checkDown = ActiveRaycaster.CheckDown(NearestSurfaceCheckDistance);
-            Below = GetNearestSurface(checkDown);
-
-            // Up adjacent.
-            ShapecastResult checkUp = ActiveRaycaster.CheckUp(NearestSurfaceCheckDistance);
-            Above = GetNearestSurface(checkUp);
-
-            // Hacky fix for sloped surfaces sometimes not being detected.
-            if (BelowAdjacent.IsSlanted)
-            {
-                if (BelowAdjacent.FacesLeft && ToRightAdjacent.IsAir)
-                    ToRight = Below;
-                else if (BelowAdjacent.FacesRight && ToRightAdjacent.IsAir)
-                    ToLeft = Below;
-            }
-
-            else if (BelowAdjacent.IsAir)
-            {
-                if (ToLeftAdjacent.FacesUp)
-                    Below = ToLeft;
-                else if (ToRightAdjacent.FacesUp)
-                    Below = ToRight;
-            }
-
-            if (AboveAdjacent.IsSlanted)
-            {
-                if (AboveAdjacent.FacesLeft && ToRightAdjacent.IsAir)
-                    ToRight = Above;
-                else if (AboveAdjacent.FacesRight && ToLeftAdjacent.IsAir)
-                    ToLeft = Above;
-            }
-
-            else if (AboveAdjacent.IsAir)
-            {
-                if (ToLeftAdjacent.FacesDown)
-                    Above = ToLeft;
-                else if (ToRightAdjacent.FacesDown)
-                    Above = ToRight;
-            }
-
-            // Debug prints.
-            if (Input.IsKeyPressed(Key.P))
-            {
-                GD.Print("< " + ToLeft);
-                GD.Print("> " + ToRight);
-                GD.Print("v " + Below);
-                GD.Print("^ " + Above);
-            }
+            ShapecastResult check = ActiveRaycaster.CheckVertical(distance);
+            DoMove(check.HitVector);
         }
+        else
+            DoMove(Vector3.Up * distance);
+    }
 
-        private NearestSurface GetNearestSurface(ShapecastResult castResult)
+    private void DoMove(Vector3 movement)
+    {
+        if (MovementTargetNode == null)
+            Translate(movement);
+        else
+            MovementTargetNode.Translate(movement);
+    }
+
+
+    private void ApplyFacing(FaceDirection direction)
+    {
+        if (direction.X == FaceDirectionX.Left)
+            IsFacingLeft = true;
+        else if (direction.X == FaceDirectionX.Right)
+            IsFacingRight = true;
+
+        if (direction.Y == FaceDirectionY.Down)
+            IsFacingDown = true;
+        else if (direction.Y == FaceDirectionY.Up)
+            IsFacingUp = true;
+    }
+
+
+    private void UpdateSurroundings()
+    {
+        // If there is no currently-active raycaster, all surroundings become empty air.
+        if (ActiveRaycaster == null)
         {
-            // Do initial surface conversion.
-            Vector2 up = new Vector2(Vector3.Up.X, Vector3.Up.Y);
-            Vector2 normal = new Vector2(castResult.HitNormal.X, castResult.HitNormal.Y);
-
-            AdjacentSurface surface = new AdjacentSurface(castResult.HasHit, normal, up,
-                MaxSlopeAngle, MaxGroundAngle, MaxCeilingSlopeAngle, MaxCeilingAngle);
-
-            // Convert to nearest surface.
-            return new NearestSurface(surface, castResult.HitDistance, AdjacencyCheckDistance);
+            ToLeft = NearestSurface.Nothing;
+            ToRight = NearestSurface.Nothing;
+            Above = NearestSurface.Nothing;
+            Below = NearestSurface.Nothing;
+            return;
         }
+
+        // Left adjacent.
+        ShapecastResult checkLeft = ActiveRaycaster.CheckLeft(NearestSurfaceCheckDistance);
+        ToLeft = GetNearestSurface(checkLeft);
+
+        // Right adjacent.
+        ShapecastResult checkRight = ActiveRaycaster.CheckRight(NearestSurfaceCheckDistance);
+        ToRight = GetNearestSurface(checkRight);
+
+        // Down adjacent.
+        ShapecastResult checkDown = ActiveRaycaster.CheckDown(NearestSurfaceCheckDistance);
+        Below = GetNearestSurface(checkDown);
+
+        // Up adjacent.
+        ShapecastResult checkUp = ActiveRaycaster.CheckUp(NearestSurfaceCheckDistance);
+        Above = GetNearestSurface(checkUp);
+
+        // Hacky fix for sloped surfaces sometimes not being detected.
+        if (BelowAdjacent.IsSlanted)
+        {
+            if (BelowAdjacent.FacesLeft && ToRightAdjacent.IsAir)
+                ToRight = Below;
+            else if (BelowAdjacent.FacesRight && ToRightAdjacent.IsAir)
+                ToLeft = Below;
+        }
+
+        else if (BelowAdjacent.IsAir)
+        {
+            if (ToLeftAdjacent.FacesUp)
+                Below = ToLeft;
+            else if (ToRightAdjacent.FacesUp)
+                Below = ToRight;
+        }
+
+        if (AboveAdjacent.IsSlanted)
+        {
+            if (AboveAdjacent.FacesLeft && ToRightAdjacent.IsAir)
+                ToRight = Above;
+            else if (AboveAdjacent.FacesRight && ToLeftAdjacent.IsAir)
+                ToLeft = Above;
+        }
+
+        else if (AboveAdjacent.IsAir)
+        {
+            if (ToLeftAdjacent.FacesDown)
+                Above = ToLeft;
+            else if (ToRightAdjacent.FacesDown)
+                Above = ToRight;
+        }
+
+        // Debug prints.
+        if (Input.IsKeyPressed(Key.P))
+        {
+            GD.Print("< " + ToLeft);
+            GD.Print("> " + ToRight);
+            GD.Print("v " + Below);
+            GD.Print("^ " + Above);
+        }
+    }
+
+    private NearestSurface GetNearestSurface(ShapecastResult castResult)
+    {
+        // Do initial surface conversion.
+        Vector2 up = new Vector2(Vector3.Up.X, Vector3.Up.Y);
+        Vector2 normal = new Vector2(castResult.HitNormal.X, castResult.HitNormal.Y);
+
+        AdjacentSurface surface = new AdjacentSurface(castResult.HasHit, normal, up,
+            MaxSlopeAngle, MaxGroundAngle, MaxCeilingSlopeAngle, MaxCeilingAngle);
+
+        // Convert to nearest surface.
+        return new NearestSurface(surface, castResult.HitDistance, AdjacencyCheckDistance);
     }
 }
