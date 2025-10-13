@@ -139,49 +139,63 @@ namespace Rusty.Pawns
 
             for (int i = 0; i < SubSteps; i++)
             {
-                // Update action properties.
+                // Update actions' properties.
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
                     {
-                        ActionProperties current = action.GetProperties();
-                        action.UpdateProperties(subDeltaTime, this);
-                        ActionProperties next = action.GetProperties();
-                        if (current != next)
+                        if (action is IActionWithProperties withProps)
                         {
-                            current?.OnDeactivate(subDeltaTime, this);
-                            next?.OnActivate(subDeltaTime, this);
+                            ActionProperties current = withProps.GetProperties();
+                            withProps.UpdateProperties(subDeltaTime, this);
+                            ActionProperties next = withProps.GetProperties();
+                            if (current != next)
+                            {
+                                current?.OnDeselected(subDeltaTime, this);
+                                next?.OnSelected(subDeltaTime, this);
+                            }
                         }
                     }
-                    else
-                        action.ForceStop();
                 }
 
-                // Update speed.
+                // Update actions' acceleration.
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
-                        action.UpdateSpeed(subDeltaTime, this);
-                    else
-                        action.ForceStop();
+                    {
+                        if (action is MovementAction movement)
+                            movement.UpdateAcceleration(subDeltaTime, this);
+                    }
                 }
 
-                // Update movement.
+                // Update actions' speed.
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
-                        action.UpdateMovement(subDeltaTime, this);
-                    else
-                        action.ForceStop();
+                    {
+                        if (action is MovementAction movement)
+                            movement.UpdateSpeed(subDeltaTime, this);
+                    }
                 }
 
-                // Update face direction.
+                // Update actions' movement.
                 foreach (Action action in Actions)
                 {
                     if (action.CheckActive(this))
-                        action.UpdateFaceDirection(subDeltaTime, this);
-                    else
-                        action.ForceStop();
+                    {
+                        if (action is MovementAction movement)
+                            movement.UpdateMovement(subDeltaTime, this);
+                    }
+                }
+
+                // Update actions' face direction.
+                foreach (Action action in Actions)
+                {
+                    if (action.CheckActive(this))
+                    {
+                        if (action is MovementAction movement)
+                            movement.UpdateFaceDirection(subDeltaTime, this);
+                    }
                 }
 
                 // Apply each action.
@@ -189,8 +203,11 @@ namespace Rusty.Pawns
                 {
                     if (action.CheckActive(this))
                     {
-                        DoMove(action.GetMovement(), true, action.DescendsSlopes);
-                        ApplyFacing(action.GetFaceDirection());
+                        if (action is MovementAction movement)
+                        {
+                            DoMove(movement.GetMovement(), true, movement.DescendsSlopes);
+                            ApplyFacing(movement.GetFaceDirection());
+                        }
                     }
                 }
             }

@@ -1,94 +1,75 @@
 using Godot;
 using Rusty.Quantities;
 
-namespace Rusty.Pawns
+namespace Rusty.Pawns;
+
+/// <summary>
+/// A horizontal movement action.
+/// </summary>
+[GlobalClass]
+public sealed partial class WalkAction : MovementActionX<WalkProperties>
 {
-    /// <summary>
-    /// A horizontal movement action.
-    /// </summary>
-    [GlobalClass]
-    public sealed partial class WalkAction : ActionX<WalkProperties>
+    /* Public properties. */
+    public override bool DescendsSlopes => true;
+
+    public float WalkFactor { get; private set; }
+
+    /* Public methods. */
+    public void Walk(float walkFactor)
     {
-        /* Public properties. */
-        public override bool DescendsSlopes => true;
+        WalkFactor = walkFactor;
+    }
 
-        public float WalkFactor { get; private set; }
+    public override void ForceStop()
+    {
+        base.ForceStop();
+        WalkFactor = 0f;
+    }
 
-        /* Public methods. */
-        public void Walk(float walkFactor)
+    protected override Speed CalculateSpeed(double deltaTime, Pawn pawn)
+    {
+        // Get current and target speed.
+        Speed targetSpeed = WalkFactor * CurrentProperties.TopSpeed;
+        Speed newSpeed = CurrentSpeed;
+
+        // Determine speed.
+
+        // Case 1: Not walking.
+        if (CurrentSpeed == 0f && targetSpeed == 0f)
+        { }
+
+        // Case 2: Turning.
+        else if (CurrentSpeed > 0f && targetSpeed < 0f || CurrentSpeed < 0f && targetSpeed > 0f)
         {
-            WalkFactor = walkFactor;
+            Acceleration acceleration = Acceleration.FromUVT(CurrentProperties.TopSpeed, -CurrentProperties.TopSpeed, CurrentProperties.TurnTime);
+            newSpeed = CurrentSpeed.Step(targetSpeed, (double)acceleration * deltaTime);
         }
 
-        public override void ForceStop()
+        // Case 3: Initial speed.
+        else if (CurrentSpeed == 0f && targetSpeed != 0f)
+            newSpeed = WalkFactor * CurrentProperties.StartSpeed;
+
+        // Case 4: Accelerating.
+        else if (CurrentSpeed.Abs() < targetSpeed.Abs())
         {
-            base.ForceStop();
-            WalkFactor = 0f;
+            Acceleration acceleration = Acceleration.FromUVT(CurrentProperties.StartSpeed, CurrentProperties.TopSpeed, CurrentProperties.AccelerationTime);
+            newSpeed = CurrentSpeed.Step(targetSpeed, (double)acceleration * deltaTime);
         }
 
-        public override void UpdateSpeed(double deltaTime, Pawn pawn)
+        // Case 5: Decelerating.
+        else if (CurrentSpeed.Abs() > targetSpeed.Abs())
         {
-            if (CurrentProperties == null)
-            {
-                CurrentSpeed = 0f;
-                return;
-            }
-
-            // Get current and target speed.
-            Speed targetSpeed = WalkFactor * CurrentProperties.TopSpeed;
-
-            // Determine speed.
-
-            // Case 1: Not walking.
-            if (CurrentSpeed == 0f && targetSpeed == 0f)
-            { }
-
-            // Case 2: Turning.
-            else if (CurrentSpeed > 0f && targetSpeed < 0f || CurrentSpeed < 0f && targetSpeed > 0f)
-            {
-                Acceleration acceleration = Acceleration.FromUVT(CurrentProperties.TopSpeed, -CurrentProperties.TopSpeed, CurrentProperties.TurnTime);
-                CurrentSpeed = CurrentSpeed.Step(targetSpeed, (double)acceleration * deltaTime);
-            }
-
-            // Case 3: Initial speed.
-            else if (CurrentSpeed == 0f && targetSpeed != 0f)
-                CurrentSpeed = WalkFactor * CurrentProperties.StartSpeed;
-
-            // Case 4: Accelerating.
-            else if (CurrentSpeed.Abs() < targetSpeed.Abs())
-            {
-                Acceleration acceleration = Acceleration.FromUVT(CurrentProperties.StartSpeed, CurrentProperties.TopSpeed, CurrentProperties.AccelerationTime);
-                CurrentSpeed = CurrentSpeed.Step(targetSpeed, (double)acceleration * deltaTime);
-            }
-
-            // Case 5: Decelerating.
-            else if (CurrentSpeed.Abs() > targetSpeed.Abs())
-            {
-                Acceleration acceleration = Acceleration.FromUVT(CurrentProperties.TopSpeed, 0f, CurrentProperties.DecelerationTime);
-                CurrentSpeed = CurrentSpeed.Step(0f, (double)acceleration * deltaTime);
-            }
-
-            // Stop when moving into a wall.
-            if (CurrentSpeed < 0f && (pawn.ToLeftAdjacent.IsWall || pawn.ToLeftAdjacent.IsSteepGround || pawn.ToLeftAdjacent.IsSteepCeiling)
-                || CurrentSpeed > 0f && (pawn.ToRightAdjacent.IsWall || pawn.ToRightAdjacent.IsSteepGround || pawn.ToRightAdjacent.IsSteepCeiling))
-            {
-                CurrentSpeed = 0f;
-            }
+            Acceleration acceleration = Acceleration.FromUVT(CurrentProperties.TopSpeed, 0f, CurrentProperties.DecelerationTime);
+            newSpeed = CurrentSpeed.Step(0f, (double)acceleration * deltaTime);
         }
 
-        public override void UpdateFaceDirection(double deltaTime, Pawn pawn)
+        // Stop when moving into a wall.
+        if (CurrentSpeed < 0f && (pawn.ToLeftAdjacent.IsWall || pawn.ToLeftAdjacent.IsSteepGround || pawn.ToLeftAdjacent.IsSteepCeiling)
+            || CurrentSpeed > 0f && (pawn.ToRightAdjacent.IsWall || pawn.ToRightAdjacent.IsSteepGround || pawn.ToRightAdjacent.IsSteepCeiling))
         {
-            if (CurrentMovement < 0f)
-                CurrentFaceDirection = FaceDirectionX.Left;
-            else if (CurrentMovement > 0f)
-                CurrentFaceDirection = FaceDirectionX.Right;
-            else
-                CurrentFaceDirection = FaceDirectionX.NoChange;
+            newSpeed = 0f;
         }
 
-        public sealed override bool IsMoving()
-        {
-            return WalkFactor != 0f;
-        }
+        return targetSpeed;
     }
 }

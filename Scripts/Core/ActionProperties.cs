@@ -1,19 +1,17 @@
 using Godot;
 
-namespace Rusty.Pawns
-{
-    [GlobalClass]
-    [Icon("res://Nerves/Modules/Level 2/Pawns/Core/ActionProperties.svg")]
-    public abstract partial class ActionProperties : PawnComponent
-    {
-        /// <summary>
-        /// Called when this set of properties is activated.
-        /// </summary>
-        public virtual void OnActivate(double deltaTime, Pawn pawn) { }
+namespace Rusty.Pawns;
 
-        /// <summary>
-        /// Called when this set of properties is deactivated.
-        /// </summary>
-        public virtual void OnDeactivate(double deltaTime, Pawn pawn) { }
-    }
+[GlobalClass, Icon("./ActionProperties.svg")]
+public abstract partial class ActionProperties : PawnComponent
+{
+    /// <summary>
+    /// Called when this set of properties starts being an action's active set.
+    /// </summary>
+    public virtual void OnSelected(double deltaTime, Pawn pawn) { }
+
+    /// <summary>
+    /// Called when this set of properties stops being an action's active set.
+    /// </summary>
+    public virtual void OnDeselected(double deltaTime, Pawn pawn) { }
 }
