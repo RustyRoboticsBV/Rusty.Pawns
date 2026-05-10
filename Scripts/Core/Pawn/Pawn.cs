@@ -5,9 +5,8 @@ namespace Rusty.Pawns;
 /// <summary>
 /// The top-layer node for character controllers.
 /// </summary>
-[GlobalClass]
-[Icon("./Pawn.svg")]
-public partial class Pawn : Node3D
+[GlobalClass, Icon("./Pawn.svg")]
+public sealed partial class Pawn : Node3D
 {
     /* Public properties. */
     /// <summary>
@@ -49,10 +48,7 @@ public partial class Pawn : Node3D
     [Export] public int SubSteps { get; set; } = 1;
 
     // Children.
-    public PawnChildList<Condition> Conditions { get; private set; }
-    public PawnChildList<Raycaster> Raycasters { get; private set; }
-    public PawnChildList<Action> Actions { get; private set; }
-
+    public ComponentCollection Components { get; private set; }
     public Raycaster ActiveRaycaster { get; private set; }
 
     // Face direction.
@@ -95,6 +91,15 @@ public partial class Pawn : Node3D
         DoMove(new(x, y), climbSlopes, descendSlopes);
     }
 
+    /// <summary>
+    /// Get a pawn component of some type.
+    /// </summary>
+    public T GetComponent<T>()
+        where T : PawnComponent
+    {
+        return Components.Get<T>();
+    }
+
     /* Godot overrides. */
     public override void _EnterTree()
     {
@@ -108,13 +113,7 @@ public partial class Pawn : Node3D
     public override void _Ready()
     {
         // Get all discoverable pawn children.
-        Conditions = new(this, true);
-        Raycasters = new(this, true);
-        Actions = new(this, true);
-
-        Conditions.CreateFromNodeTree(this);
-        Raycasters.CreateFromNodeTree(this);
-        Actions.CreateFromNodeTree(this);
+        Components = new ComponentCollection(this);
 
         // Call initialize methods.
         for (int i = 0; i < GetChildCount(); i++)
@@ -132,124 +131,119 @@ public partial class Pawn : Node3D
         double subDeltaTime = deltaTime / SubSteps;
 
         // Update active raycaster.
-        ActiveRaycaster = Raycasters.GetFirstActive();
+        ActiveRaycaster = Components.GetFirstActive<Raycaster>();
 
         // Update surroundings (in case objects in the environment moved).
         UpdateSurroundings();
 
+        int actionCount = Components.Count<Action>();
         for (int i = 0; i < SubSteps; i++)
         {
             // Before update properties events.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this))
                     action.BeforeUpdateProperties(deltaTime, this);
             }
 
-            // Update actions' properties.
-            foreach (Action action in Actions)
+            // Update action properties.
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this) && action is IActionWithProperties withProps)
                 {
-                    if (action is IActionWithProperties withProps)
+                    ActionProperties current = withProps.GetProperties();
+                    withProps.UpdateProperties(subDeltaTime, this);
+                    ActionProperties next = withProps.GetProperties();
+                    if (current != next)
                     {
-                        ActionProperties current = withProps.GetProperties();
-                        withProps.UpdateProperties(subDeltaTime, this);
-                        ActionProperties next = withProps.GetProperties();
-                        if (current != next)
-                        {
-                            current?.OnDeselected(subDeltaTime, this);
-                            next?.OnSelected(subDeltaTime, this);
-                        }
+                        current?.OnDeselected(subDeltaTime, this);
+                        next?.OnSelected(subDeltaTime, this);
                     }
                 }
             }
 
             // After update properties events.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this))
                     action.AfterUpdateProperties(deltaTime, this);
             }
 
-            // Update actions' acceleration.
-            foreach (Action action in Actions)
+            // Update action accelerations.
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
-                {
-                    if (action is MovementAction movement)
-                        movement.UpdateAcceleration(subDeltaTime, this);
-                }
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this) && action is MovementAction movement)
+                    movement.UpdateAcceleration(subDeltaTime, this);
             }
 
             // After update acceleration events.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this))
                     action.AfterUpdateAcceleration(deltaTime, this);
             }
 
             // Update actions' speed.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
-                {
-                    if (action is MovementAction movement)
-                        movement.UpdateSpeed(subDeltaTime, this);
-                }
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this) && action is MovementAction movement)
+                    movement.UpdateSpeed(subDeltaTime, this);
             }
 
             // After update speed events.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this))
                     action.AfterUpdateSpeed(deltaTime, this);
             }
 
             // Update actions' movement.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
-                {
-                    if (action is MovementAction movement)
-                        movement.UpdateMovement(subDeltaTime, this);
-                }
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this) && action is MovementAction movement)
+                    movement.UpdateMovement(subDeltaTime, this);
             }
 
             // After update movement events.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this))
                     action.AfterUpdateMovement(deltaTime, this);
             }
 
             // Update actions' face direction.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
-                {
-                    if (action is MovementAction movement)
-                        movement.UpdateFaceDirection(subDeltaTime, this);
-                }
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this) && action is MovementAction movement)
+                    movement.UpdateFaceDirection(subDeltaTime, this);
             }
 
             // After update face direction events.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this))
                     action.AfterUpdateFaceDirection(deltaTime, this);
             }
 
             // Apply each action.
-            foreach (Action action in Actions)
+            for (int j = 0; j < actionCount; j++)
             {
-                if (action.CheckActive(this))
+                Action action = Components.GetAt<Action>(j);
+                if (action.IsActive(this) && action is MovementAction movement)
                 {
-                    if (action is MovementAction movement)
-                    {
-                        DoMove(movement.GetMovement(), true, movement.DescendsSlopes);
-                        ApplyFacing(movement.GetFaceDirection());
-                    }
+                    DoMove(movement.GetMovement(), true, movement.DescendsSlopes);
+                    ApplyFacing(movement.GetFaceDirection());
                 }
             }
         }

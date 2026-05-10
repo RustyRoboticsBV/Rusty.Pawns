@@ -7,7 +7,6 @@ namespace Rusty.Pawns;
 public abstract partial class ActionProperties : PawnComponent, IConditions
 {
     /* Public properties. */
-    public bool Enabled { get; set; }
     public Array<Condition> Conditions { get; private set; } = new();
 
     /* Public methods. */

@@ -25,6 +25,8 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// </summary>
     public abstract void ForceStop();
 
+    // Update methods.
+
     /// <summary>
     /// Select a set of action properties to use for the next update loop, depending on the current context.
     /// </summary>
@@ -49,6 +51,8 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// Determine the face direction for this loop.
     /// </summary>
     public abstract void UpdateFaceDirection(double deltaTime, Pawn pawn);
+
+    // Getter methods.
 
     /// <summary>
     /// Get the current action properties.
@@ -75,6 +79,13 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// </summary>
     public abstract FaceDirection GetFaceDirection();
 
+    // Is not zero methods.
+
+    /// <summary>
+    /// Get whether or not the action has an active set of properties.
+    /// </summary>
+    public virtual bool HasProperties() => GetProperties() != null;
+
     /// <summary>
     /// Get whether or not the action has a non-zero acceleration.
     /// </summary>
@@ -89,6 +100,11 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// Get whether or not the action has a non-zero movement.
     /// </summary>
     public virtual bool IsMoving() => GetMovement() != Vector2.Zero;
+
+    /// <summary>
+    /// Get whether or not the action is facing in a direction.
+    /// </summary>
+    public virtual bool IsFacing() => GetFaceDirection() != FaceDirection.None;
 
     /* Protected methods. */
     /// <summary>

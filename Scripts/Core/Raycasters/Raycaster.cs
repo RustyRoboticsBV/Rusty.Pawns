@@ -10,7 +10,6 @@ namespace Rusty.Pawns;
 public abstract partial class Raycaster : PawnComponent, IConditions
 {
     /* Public properties. */
-    public bool Enabled { get; set; }
     public Array<Condition> Conditions { get; private set; } = new();
 
     public abstract Vector2 Size { get; set; }

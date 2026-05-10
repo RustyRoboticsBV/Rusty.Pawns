@@ -17,7 +17,7 @@ public partial class SimplePlayerController : Node3D
         if (Input.IsKeyPressed(Key.Right))
             moveX += 1f;
 
-        WalkAction walkAction = Pawn.Actions.Get<WalkAction>();
+        WalkAction walkAction = Pawn.GetComponent<WalkAction>();
         walkAction.Walk(moveX);
     }
 }
