@@ -1,45 +1,72 @@
 using Godot;
 
-namespace Rusty.Pawns
+namespace Rusty.Pawns;
+
+/// <summary>
+/// A condition, which can be used to dynamically enable/disable other pawn components, including other conditions.
+/// </summary>
+[GlobalClass, Icon("./Condition.svg")]
+public partial class Condition : PawnComponent
 {
+    /* Public properties. */
     /// <summary>
-    /// A condition, which can be used to dynamically enable/disable other pawn components, including other conditions.
+    /// The boolean operator that this condition will apply to its child conditions.
     /// </summary>
-    [GlobalClass]
-    [Icon("res://Nerves/Modules/Level 2/Pawns/Core/Conditions/Condition.svg")]
-    public abstract partial class Condition : PawnComponent
+    public Operator Operator { get; set; } = Operator.And;
+    /// <summary>
+    /// Negate the result of the expression.
+    /// </summary>
+    public bool Not { get; set; }
+
+    /* Public methods. */
+    /// <summary>
+    /// Checks if this condition is true. If the condition is not active, it is deemed irrelevant and this will always return
+    /// true. Child condition nodes are also checked.
+    /// </summary>
+    public bool Evaluate(Pawn pawn)
     {
-        /* Public methods. */
-        /// <summary>
-        /// Checks if this condition is true. If the condition is not active, it is deemed irrelevant and this will always return
-        /// true.
-        /// </summary>
-        public bool Evaluate(Pawn pawn)
-        {
-            // If we're not active, this condition is considered irrelevant and always returns true.
-            if (!CheckActive(pawn))
-                return true;
+        bool result = EvaluateSelf(pawn);
 
-            // Else, evaluate.
-            return DoEvaluate(pawn);
+        for (int i = 0; i < GetChildCount(); i++)
+        {
+            if (GetChild(i) is Condition condition)
+            {
+                switch (Operator)
+                {
+                    case Operator.And:
+                        result &= condition.Evaluate(pawn);
+                        break;
+                    case Operator.Or:
+                        result |= condition.Evaluate(pawn);
+                        break;
+                    case Operator.XOr:
+                        result ^= condition.Evaluate(pawn);
+                        break;
+                }
+            }
         }
 
-        /// <summary>
-        /// Checks if this condition is true. If the condition is not active, it is deemed irrelevant and this will always return
-        /// true.
-        /// </summary>
-        public bool Evaluate()
-        {
-            return Evaluate(Pawn);
-        }
+        if (Not)
+            result = !result;
 
-        /* Protected methods. */
-        /// <summary>
-        /// The evaluation logic of this condition.
-        /// </summary>
-        protected virtual bool DoEvaluate(Pawn pawn)
-        {
-            return true;
-        }
+        return result;
+    }
+
+    /// <summary>
+    /// Checks if this condition is true. If the condition is not active, it is deemed irrelevant and this will always return
+    /// true.
+    /// </summary>
+    public bool Evaluate()
+    {
+        return Evaluate(Pawn);
+    }
+
+    /* Protected methods. */
+    /// <summary>
+    /// Evaluate this condition (does not include any potential child conditions).
+    /// </summary>
+    protected virtual bool EvaluateSelf(Pawn pawn)
+    {
+        return true;
     }
 }

@@ -1,12 +1,11 @@
-﻿namespace Rusty.Pawns
+﻿namespace Rusty.Pawns;
+
+/// <summary>
+/// Represents a pawn's horizontal face direction.
+/// </summary>
+public enum FaceDirectionX
 {
-    /// <summary>
-    /// Represents a pawn's horizontal face direction.
-    /// </summary>
-    public enum FaceDirectionX
-    {
-        NoChange,
-        Left,
-        Right
-    }
+    NoChange,
+    Left,
+    Right
 }

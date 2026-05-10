@@ -82,9 +82,9 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     protected T GetActiveProperties<T>(Pawn pawn)
         where T : ActionProperties
     {
-        foreach (PawnComponent child in Children)
+        for (int i = 0; i < GetChildCount(); i++)
         {
-            if (child is T properties && properties.CheckActive(pawn))
+            if (GetChild(i) is T properties && properties.CheckActiveAndEnabled(pawn))
                 return properties;
         }
         return null;

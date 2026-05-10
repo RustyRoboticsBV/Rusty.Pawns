@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 
 namespace Rusty.Pawns;
 
@@ -6,8 +7,12 @@ namespace Rusty.Pawns;
 /// Base class for pawn actions.
 /// </summary>
 [GlobalClass, Icon("./Action.svg")]
-public abstract partial class Action : PawnComponent
+public abstract partial class Action : PawnComponent, IConditions
 {
+    /* Public properties. */
+    public bool Enabled { get; set; } = true;
+    public Array<Condition> Conditions { get; private set; } = new();
+
     /* Public methods. */
     /// <summary>
     /// Runs before the properties update loop.
@@ -38,4 +43,9 @@ public abstract partial class Action : PawnComponent
     /// Runs after the face direction update loop.
     /// </summary>
     public virtual void AfterUpdateFaceDirection(double deltaTime, Pawn pawn) { }
+
+    public bool CheckActiveAndEnabled(Pawn pawn)
+    {
+        return ((IConditions)this).CheckActiveAndEnabled(pawn);
+    }
 }
