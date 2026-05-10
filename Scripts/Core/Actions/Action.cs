@@ -7,11 +7,8 @@ namespace Rusty.Pawns;
 /// Base class for pawn actions.
 /// </summary>
 [GlobalClass, Icon("./Action.svg")]
-public abstract partial class Action : PawnComponent, IConditions
+public abstract partial class Action : ConditionedComponent
 {
-    /* Public properties. */
-    public Array<Condition> Conditions { get; private set; } = new();
-
     /* Public methods. */
     /// <summary>
     /// Runs before the properties update loop.
@@ -42,9 +39,4 @@ public abstract partial class Action : PawnComponent, IConditions
     /// Runs after the face direction update loop.
     /// </summary>
     public virtual void AfterUpdateFaceDirection(double deltaTime, Pawn pawn) { }
-
-    public bool CheckActiveAndEnabled(Pawn pawn)
-    {
-        return ((IConditions)this).CheckActiveAndEnabled(pawn);
-    }
 }

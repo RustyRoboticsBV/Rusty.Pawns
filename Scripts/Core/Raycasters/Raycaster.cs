@@ -1,17 +1,14 @@
 using Godot;
-using Godot.Collections;
 
 namespace Rusty.Pawns;
 
 /// <summary>
-/// A base class for nodes that organizes raycasts, meant for a 2D game that uses 3D physics.
+/// A base class for nodes that organizes raycasts.
 /// </summary>
 [GlobalClass, Icon("./Raycaster.svg")]
-public abstract partial class Raycaster : PawnComponent, IConditions
+public abstract partial class Raycaster : ConditionedComponent
 {
     /* Public properties. */
-    public Array<Condition> Conditions { get; private set; } = new();
-
     public abstract Vector2 Size { get; set; }
     public abstract float SkinWidth { get; set; }
 
@@ -86,11 +83,6 @@ public abstract partial class Raycaster : PawnComponent, IConditions
     /// Fire raycasts through the raycaster from the bottom side to the top side.
     /// </summary>
     public abstract ShapecastResult CheckInteriorFromBottom();
-
-    public bool CheckActiveAndEnabled(Pawn pawn)
-    {
-        return ((IConditions)this).CheckActiveAndEnabled(pawn);
-    }
 
     /* Protected methods. */
     protected static RaycastResult CheckRay(RayCast3D ray, Vector3 localOrigin, Vector3 direction, float distance, uint layers)

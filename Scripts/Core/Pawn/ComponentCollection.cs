@@ -70,15 +70,17 @@ public class ComponentCollection
     /// </summary>
     private void Create()
     {
-        Type baseType = typeof(PawnComponent);
-
         // Do nothing if the child dictionary was already created.
-        if (Children == null)
+        if (Children != null)
             return;
+        Children = new Dictionary<Type, List<PawnComponent>>();
 
         // Add list for base component type.
-        if (!Children.ContainsKey(baseType))
-            Children.Add(baseType, new());
+        Children.Add(typeof(PawnComponent), new());
+        Children.Add(typeof(Raycaster), new());
+        Children.Add(typeof(Action), new());
+        Children.Add(typeof(ActionProperties), new());
+        Children.Add(typeof(Condition), new());
 
         // Add lists for each type of component.
         for (int i = 0; i < Pawn.GetChildCount(); i++)
@@ -92,8 +94,16 @@ public class ComponentCollection
                     Children.Add(type, new());
 
                 // Add node to lists.
-                Children[baseType].Add(component);
+                Children[typeof(PawnComponent)].Add(component);
                 Children[type].Add(component);
+                if (component is Raycaster)
+                    Children[typeof(Raycaster)].Add(component);
+                if (component is Action)
+                    Children[typeof(Action)].Add(component);
+                if (component is ActionProperties)
+                    Children[typeof(ActionProperties)].Add(component);
+                if (component is Condition)
+                    Children[typeof(Condition)].Add(component);
             }
         }
     }

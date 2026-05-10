@@ -1,14 +1,13 @@
 using Godot;
-using Godot.Collections;
 
 namespace Rusty.Pawns;
 
+/// <summary>
+/// A base class for all pawn action properties.
+/// </summary>
 [GlobalClass, Icon("./ActionProperties.svg")]
-public abstract partial class ActionProperties : PawnComponent, IConditions
+public abstract partial class ActionProperties : ConditionedComponent
 {
-    /* Public properties. */
-    public Array<Condition> Conditions { get; private set; } = new();
-
     /* Public methods. */
     /// <summary>
     /// Called when this set of properties starts being an action's active set.
@@ -19,9 +18,4 @@ public abstract partial class ActionProperties : PawnComponent, IConditions
     /// Called when this set of properties stops being an action's active set.
     /// </summary>
     public virtual void OnDeselected(double deltaTime, Pawn pawn) { }
-
-    public bool CheckActiveAndEnabled(Pawn pawn)
-    {
-        return ((IConditions)this).CheckActiveAndEnabled(pawn);
-    }
 }
