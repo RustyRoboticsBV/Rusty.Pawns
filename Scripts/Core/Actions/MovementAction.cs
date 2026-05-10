@@ -9,7 +9,15 @@ namespace Rusty.Pawns;
 public abstract partial class MovementAction : Action, IActionWithProperties
 {
     /* Public properties. */
+    /// <summary>
+    /// Whether or not this movement moves down sloped ground.
+    /// </summary>
     public virtual bool DescendsSlopes => false;
+
+    /// <summary>
+    /// Whether or not this movement moves down sloped ceilings.
+    /// </summary>
+    public virtual bool DescendsSlopedCeilings => false;
 
     /* Public methods. */
     /// <summary>
@@ -68,12 +76,19 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     public abstract FaceDirection GetFaceDirection();
 
     /// <summary>
+    /// Get whether or not the action has a non-zero acceleration.
+    /// </summary>
+    public virtual bool IsAccelerating() => GetAcceleration() != Vector2.Zero;
+
+    /// <summary>
+    /// Get whether or not the action has a non-zero speed.
+    /// </summary>
+    public virtual bool IsSpeeding() => GetSpeed() != Vector2.Zero;
+
+    /// <summary>
     /// Get whether or not the action has a non-zero movement.
     /// </summary>
-    public virtual bool IsMoving()
-    {
-        return GetMovement() != Vector2.Zero;
-    }
+    public virtual bool IsMoving() => GetMovement() != Vector2.Zero;
 
     /* Protected methods. */
     /// <summary>
