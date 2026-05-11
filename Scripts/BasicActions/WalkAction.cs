@@ -15,6 +15,10 @@ public sealed partial class WalkAction : MovementActionX<WalkProperties>
     public float WalkFactor { get; private set; }
 
     /* Public methods. */
+    public void WalkRight() => Walk(1f);
+
+    public void WalkLeft() => Walk(-1f);
+
     public void Walk(float walkFactor)
     {
         WalkFactor = walkFactor;
