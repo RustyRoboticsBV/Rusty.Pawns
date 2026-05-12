@@ -15,9 +15,24 @@ The framework uses Godot's 3D physics system. Movement is constrained to a 2D pl
 The `Pawn` class is the central node of the controller. It is responsible for:
 - Collecting and managing all attached `PawnComponent` children.
 - Running the movement pipeline.
-- Detectimg and classifying surfaces.
+- Detecting and classifying surfaces.
 
 Attached components can be retrieved by type and/or by name with the `GetComponent` method.
+
+Ten types of surfaces are recognized:
+- `Air`
+- `Ground`:
+  - `Level ground`
+  - `Sloped ground`: can be climbed and descended.
+  - `Steep ground`: can be descended but not climbed.
+- `Wall`:
+  - `Straight wall`
+  - `Downwards sloped wall`: redirects downwards movement.
+  - `Upwards sloped wall`: redirects upwards movement.
+- `Ceiling`:
+  - `Level ceiling`
+  - `Sloped ceiling`: can be climbed and descended.
+  - `Steep ceiling`: can be descended but not climbed.
 
 ## Components
 

@@ -23,9 +23,8 @@ metadata/_custom_type_script = "uid://kl8e2pf3srga"
 script = ExtResource("3_i5arm")
 metadata/_custom_type_script = "uid://3qdjw51711mm"
 
-[node name="WalkAction" type="Node3D" parent="SimplePlayerController/Pawn" node_paths=PackedStringArray("Conditions")]
+[node name="WalkAction" type="Node3D" parent="SimplePlayerController/Pawn"]
 script = ExtResource("3_jka67")
-Conditions = [null]
 metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
 
 [node name="WalkProperties" type="Node3D" parent="SimplePlayerController/Pawn/WalkAction"]

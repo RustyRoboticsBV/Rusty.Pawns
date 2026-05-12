@@ -6,8 +6,8 @@ namespace Rusty.Pawns;
 /// <summary>
 /// Base class for pawn component nodes that contain a conditions list and an enabled toggle.
 /// </summary>
-[GlobalClass, Icon("./ConditionalComponent.svg")]
-public abstract partial class ConditionalComponent : PawnComponent
+[GlobalClass, Icon("./Behavior.svg")]
+public abstract partial class Behavior : PawnComponent
 {
     /* Public properties. */
     /// <summary>
