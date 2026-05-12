@@ -6,7 +6,7 @@ namespace Rusty.Pawns;
 /// A base class for nodes that organizes raycasts.
 /// </summary>
 [GlobalClass, Icon("./Raycaster.svg")]
-public abstract partial class Raycaster : ConditionedComponent
+public abstract partial class Raycaster : ConditionalComponent
 {
     /* Public properties. */
     public abstract Vector2 Size { get; set; }

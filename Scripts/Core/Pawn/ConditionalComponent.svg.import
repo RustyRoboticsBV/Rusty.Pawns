@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cgb3rjdo6kw2u"
-path="res://.godot/imported/Raycaster.svg-8c3250f8c7c4a0ca88d66a2d38f6f689.ctex"
+uid="uid://ciuqjwm0xnbai"
+path="res://.godot/imported/ConditionalComponent.svg-df5dcaf362a6cf32e7d744d09fbe5405.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/Core/Raycasters/Raycaster.svg"
-dest_files=["res://.godot/imported/Raycaster.svg-8c3250f8c7c4a0ca88d66a2d38f6f689.ctex"]
+source_file="res://Scripts/Core/Pawn/ConditionalComponent.svg"
+dest_files=["res://.godot/imported/ConditionalComponent.svg-df5dcaf362a6cf32e7d744d09fbe5405.ctex"]
 
 [params]
 

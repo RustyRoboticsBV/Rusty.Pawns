@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 24.1.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<svg version="1.1" id="Layer_1" viewBox="0 0 16 16">
 <style type="text/css">
-	.st0{fill:#E0E0E0;}
+	.st0{fill:#F37D7F;}
 </style>
-<rect x="-34.5" y="119.7" transform="matrix(0.7078 -0.7064 0.7064 0.7078 -60.0424 145.6444)" class="st0" width="361.1" height="51.3"/>
-<rect x="76" y="230.3" transform="matrix(0.7078 -0.7064 0.7064 0.7078 -105.8183 256.0001)" class="st0" width="361.1" height="51.3"/>
-<rect x="186" y="340.2" transform="matrix(0.7078 -0.7064 0.7064 0.7078 -151.3627 365.8561)" class="st0" width="361.1" height="51.3"/>
+<rect x="-1.1" y="3.8" transform="matrix(0.7078 -0.7064 0.7064 0.7078 -1.8873 4.5505)" class="st0" width="11.3" height="1.6"/>
+<rect x="2.4" y="7.2" transform="matrix(0.7078 -0.7064 0.7064 0.7078 -3.3195 7.9986)" class="st0" width="11.3" height="1.6"/>
+<rect x="5.8" y="10.6" transform="matrix(0.7078 -0.7064 0.7064 0.7078 -4.7401 11.4271)" class="st0" width="11.3" height="1.6"/>
 </svg>

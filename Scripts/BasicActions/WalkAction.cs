@@ -6,7 +6,7 @@ namespace Rusty.Pawns;
 /// <summary>
 /// A horizontal movement action.
 /// </summary>
-[GlobalClass]
+[GlobalClass, Icon("./WalkAction.svg")]
 public sealed partial class WalkAction : MovementActionX<WalkProperties>
 {
     /* Public properties. */

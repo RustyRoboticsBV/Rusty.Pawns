@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=7 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
+[ext_resource type="Script" uid="uid://3qdjw51711mm" path="res://Scripts/Core/Raycasters/RaycastBox.cs" id="3_i5arm"]
 [ext_resource type="Script" uid="uid://c6d8wnkdq05kb" path="res://Scripts/BasicActions/WalkAction.cs" id="3_jka67"]
 [ext_resource type="Script" uid="uid://b04sx7q872ytp" path="res://Scripts/BasicActions/WalkProperties.cs" id="4_r3fl7"]
 
@@ -18,8 +19,13 @@ metadata/_custom_type_script = "uid://qln580dj5gv5"
 script = ExtResource("2_r3fl7")
 metadata/_custom_type_script = "uid://kl8e2pf3srga"
 
-[node name="WalkAction" type="Node3D" parent="SimplePlayerController/Pawn"]
+[node name="RaycastBox" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("3_i5arm")
+metadata/_custom_type_script = "uid://3qdjw51711mm"
+
+[node name="WalkAction" type="Node3D" parent="SimplePlayerController/Pawn" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("3_jka67")
+Conditions = [null]
 metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
 
 [node name="WalkProperties" type="Node3D" parent="SimplePlayerController/Pawn/WalkAction"]

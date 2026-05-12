@@ -6,7 +6,7 @@ namespace Rusty.Pawns;
 /// <summary>
 /// A node that organizes raycasts along a line relative to its parent node.
 /// </summary>
-[GlobalClass, Icon("./RaycastArray.svg")]
+[GlobalClass, Icon("./Raycaster.svg")]
 public sealed partial class RaycastArray : Node3D
 {
     /* Public properties. */
