@@ -19,6 +19,9 @@ The `Pawn` class is the central node of the controller. It is responsible for:
 
 Attached components can be retrieved by type and/or by name with the `GetComponent` method.
 
+### Surface Types
+The `Pawn` collects surface information in all four directions. This includes distance, surface normal, angle and semantic classification.
+
 Ten types of surfaces are recognized:
 - `Air`
 - `Ground`:
@@ -36,7 +39,7 @@ Ten types of surfaces are recognized:
 
 ## Components
 
-The pawn doesn't do much on its own. All functionality is implemented by attaching `PawnComponent` nodes. All components are processed in scene tree order. There are four categories: raycasters, actions, properties and conditions. The actions are split into two sub-groups: movement and modifiers.
+The pawn doesn't do much on its own. All functionality is implemented by attaching `PawnComponent` nodes. All components are processed in scene tree order. There are six categories: raycasters, actions, properties, triggers, effects and conditions. The actions are split into two sub-groups: movement and modifiers.
 
 ### Movement Actions
 A `Movement` action is a `PawnComponent` that manages its own state, including properties, acceleration, speed, displacement and face direction. Each state has a dedicated update method.
@@ -62,17 +65,19 @@ A `Raycaster` component is a collision detector. Multiple raycasters can be comb
 
 Five types exist: `PointCaster`, `LineCaster`, `CircleCaster`, `BoxCaster` and `CapsuleCaster`.
 
+### Triggers and Effects
+A `Trigger` component represents an event or state transition. They may have one or more `Effect` child nodes; whenever the trigger's criteria are met, all child effects are executed.
+
+Effects can do anything, such as enablind/disabling a component or calling a method on an action of some type.
+
+An example of a built-in triggers are `KeyEvent` and `LandedEvent`. An example of a built-in effect is `JumpEffect`, which calls the `Jump` method of a `JumpAction` or `JumpFallAction`.
+
 ### Conditions
 A `Condition` component is used to evaluate whether a specific condition is true. By itself, it does not perform any behavior.
 
-Actions, properties and raycasters all contain a `Conditions` field that determines when the component is active. A component is only active when all assigned conditions evaluate to true.
+Actions, properties, raycasters, triggers and effects all contain a `Conditions` field that determines when the component is active. A component is only active when all assigned conditions evaluate to true.
 
 The `Pawn` automatically enables and disables components based on their conditions.
-
-Using conditions, you can do things like:
-- Switch out an actions' properties.
-- Enable/disable entire actions.
-- Change the collision shape.
 
 Examples of built-in conditions include `IsGroundedCondition`, `IsFacingWallCondition` and `IsMovingCondition`.
 
@@ -81,6 +86,14 @@ Conditions can be combined using various logical operator conditions:
 - `OrCondition`: is true if at least one referenced condition is true.
 - `XorCondition`: is true if exactly one referenced condition is true.
 - `NotCondition`: is true if the referenced condition is NOT true.
+
+A disabled component has the following effect:
+- Movement: no updates occur, and the displacement does not affect the pawn's position.
+- Modifier: no updates occur, and no actions are modified.
+- ActionProperties: are never used by their parent action.
+- Raycaster: the raycaster does not do any collision checking.
+- Trigger: the trigger never fires.
+- Effect: the effect is not invoked if its parent trigger fires.
 
 ## Drivers
 `Driver` classes are responsible for calling certain action methods at appropriate times (i.e. in response to player inputs or enemy AI logic). A `Driver` can only control one `Pawn`.
