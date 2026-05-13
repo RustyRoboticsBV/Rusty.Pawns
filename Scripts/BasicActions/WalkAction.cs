@@ -51,7 +51,12 @@ public sealed partial class WalkAction : MovementActionX<WalkProperties>
 
         // Case 3: Initial speed.
         else if (CurrentSpeed == 0f && targetSpeed != 0f)
-            newSpeed = WalkFactor * CurrentProperties.StartSpeed;
+        {
+            if (CurrentProperties.AccelerationTime == 0)
+                newSpeed = WalkFactor * CurrentProperties.TopSpeed;
+            else
+                newSpeed = WalkFactor * CurrentProperties.StartSpeed;
+        }
 
         // Case 4: Accelerating.
         else if (CurrentSpeed.Abs() < targetSpeed.Abs())

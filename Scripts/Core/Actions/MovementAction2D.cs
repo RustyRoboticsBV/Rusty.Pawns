@@ -68,7 +68,7 @@ public abstract partial class MovementAction2D<T> : MovementAction
         }
     }
 
-    public sealed override void UpdateMovement(double deltaTime, Pawn pawn)
+    public sealed override void UpdateDistance(double deltaTime, Pawn pawn)
     {
         if (CurrentProperties == null)
         {

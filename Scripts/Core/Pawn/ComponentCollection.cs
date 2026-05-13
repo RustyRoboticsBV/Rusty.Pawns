@@ -14,97 +14,147 @@ public class ComponentCollection
 
     /* Private properties. */
     private Dictionary<Type, List<PawnComponent>> Children { get; set; }
+    private HashSet<PawnComponent> Registry { get; set; } = new HashSet<PawnComponent>();
 
     /* Constructors. */
     public ComponentCollection(Pawn pawn)
     {
         Pawn = pawn;
-        Create();
+        Scan(pawn);
     }
 
     /* Public methods. */
     /// <summary>
-    /// Get the number of components of some type.
+    /// Register a component.
     /// </summary>
-    public int Count<T>()
+    public void Add(PawnComponent component)
     {
-        return Children[typeof(T)].Count;
+        if (component == null)
+            throw new ArgumentNullException(nameof(component));
+
+        // Add node to list(s).
+        Type type = component.GetType();
+        while (type != null && typeof(PawnComponent).IsAssignableFrom(type))
+        {
+            // Get or create the component type's list.
+            if (!Children.TryGetValue(type, out var list))
+            {
+                list = new List<PawnComponent>();
+                Children[type] = list;
+            }
+
+            // Add the component to its list.
+            if (!Registry.Contains(component))
+                list.Add(component);
+
+            // Continue with base type.
+            type = type.BaseType;
+        }
+
+        // Add to registry.
+        Registry.Add(component);
     }
 
     /// <summary>
-    /// Get a component of some type.
+    /// Unregister a component.
+    /// </summary>
+    public void Remove(PawnComponent component)
+    {
+        if (component == null)
+            throw new ArgumentNullException(nameof(component));
+
+        if (!Registry.Contains(component))
+            throw new ArgumentException($"The component was not a member of pawn '{Pawn.Name}'.", nameof(component));
+
+        // Remove node from list(s).
+        Type type = component.GetType();
+        while (type != null && typeof(PawnComponent).IsAssignableFrom(type))
+        {
+            // Remove from the component type's list.
+            if (Children.TryGetValue(type, out var list))
+                list.Remove(component);
+
+            // Continue with base type.
+            type = type.BaseType;
+        }
+
+        // Remove from registry.
+        Registry.Remove(component);
+    }
+
+    /// <summary>
+    /// Get the number of components of some type (including derived types).
+    /// </summary>
+    public int Count<T>()
+        where T : PawnComponent
+    {
+        return Children.TryGetValue(typeof(T), out var list)
+            ? list.Count
+            : 0;
+    }
+
+    /// <summary>
+    /// Get a component of some type (including derived types).
     /// </summary>
     public T Get<T>()
         where T : PawnComponent
     {
-        return (T)Children[typeof(T)][0];
+        if (Children.TryGetValue(typeof(T), out var list) && list.Count > 0)
+            return (T)list[0];
+
+        return null;
     }
 
     /// <summary>
-    /// Get a component of some type.
+    /// Get a component of some type (including derived types).
     /// </summary>
     public T GetAt<T>(int index)
         where T : PawnComponent
     {
-        return (T)Children[typeof(T)][index];
+        if (Children.TryGetValue(typeof(T), out var list) && index >= 0 && index < list.Count)
+            return (T)list[index];
+
+        return null;
     }
 
     /// <summary>
-    /// Get the first active component of some type.
+    /// Get the first active component of some type (including derived types).
     /// </summary>
     public T GetFirstActive<T>()
         where T : PawnComponent
     {
-        List<PawnComponent> components = Children[typeof(T)];
-        for (int i = 0; i < components.Count; i++)
+        if (!Children.TryGetValue(typeof(T), out var list))
+            return null;
+
+        for (int i = 0; i < list.Count; i++)
         {
-            if (components[i].IsActive(Pawn))
-                return (T)components[i];
+            if (list[i].IsActive(Pawn))
+                return (T)list[i];
         }
+
         return null;
     }
 
     /* Private methods. */
     /// <summary>
-    /// Create the collection.
+    /// Recursively collect a node's child pawn component. Is blocked by child pawns.
     /// </summary>
-    private void Create()
+    private void Scan(Node root)
     {
         // Do nothing if the child dictionary was already created.
         if (Children != null)
             return;
         Children = new Dictionary<Type, List<PawnComponent>>();
 
-        // Add list for base component type.
-        Children.Add(typeof(PawnComponent), new());
-        Children.Add(typeof(Raycaster), new());
-        Children.Add(typeof(Action), new());
-        Children.Add(typeof(ActionProperties), new());
-        Children.Add(typeof(Condition), new());
-
         // Add lists for each type of component.
-        for (int i = 0; i < Pawn.GetChildCount(); i++)
+        for (int i = 0; i < root.GetChildCount(); i++)
         {
-            Node node = Pawn.GetChild(i);
+            Node node = root.GetChild(i);
             if (node is PawnComponent component)
-            {
-                // Add list for child type.
-                Type type = node.GetType();
-                if (!Children.ContainsKey(type))
-                    Children.Add(type, new());
+                Add(component);
 
-                // Add node to lists.
-                Children[typeof(PawnComponent)].Add(component);
-                Children[type].Add(component);
-                if (component is Raycaster)
-                    Children[typeof(Raycaster)].Add(component);
-                if (component is Action)
-                    Children[typeof(Action)].Add(component);
-                if (component is ActionProperties)
-                    Children[typeof(ActionProperties)].Add(component);
-                if (component is Condition)
-                    Children[typeof(Condition)].Add(component);
-            }
+            if (node is not Pawn pawn)
+                Scan(node);
         }
     }
 }

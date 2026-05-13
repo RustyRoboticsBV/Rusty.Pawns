@@ -33,7 +33,7 @@ public abstract partial class Action : Behavior
     /// <summary>
     /// Runs after the movement update loop before the face direction update loop.
     /// </summary>
-    public virtual void AfterUpdateMovement(double deltaTime, Pawn pawn) { }
+    public virtual void AfterUpdateDistance(double deltaTime, Pawn pawn) { }
 
     /// <summary>
     /// Runs after the face direction update loop.

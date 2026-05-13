@@ -39,7 +39,9 @@ Ten types of surfaces are recognized:
 
 ## Components
 
-The pawn doesn't do much on its own. All functionality is implemented by attaching `PawnComponent` nodes. All components are processed in scene tree order. There are six categories: raycasters, actions, properties, triggers, effects and conditions. The actions are split into two sub-groups: movement and modifiers.
+The pawn doesn't do much on its own. All functionality is implemented by attaching `PawnComponent` nodes. There are six categories: raycasters, actions, properties, triggers, effects and conditions. The actions are split into two sub-groups: movement and modifiers.
+
+All components are processed in several phases, by scene tree order in each phase. The phases are: `EvaluateConditions`, `InvokeTriggers`, `UpdateMovementProperties`, `ModifierPostUpdateProperties`, `UpdateMovementAcceleration`, `ModifierPostUpdateAcceleration`, `UpdateMovementSpeed`, `ModifierPostUpdateSpeed`, `UpdateMovementDistance`, `ModifierPostUpdateDistance`, `UpdateMovementFaceDirection`, `ModifierPostUpdateFaceDirection` and `CommitMovement`.
 
 ### Movement Actions
 A `Movement` action is a `PawnComponent` that manages its own state, including properties, acceleration, speed, displacement and face direction. Each state has a dedicated update method.
@@ -68,7 +70,7 @@ Five types exist: `PointCaster`, `LineCaster`, `CircleCaster`, `BoxCaster` and `
 ### Triggers and Effects
 A `Trigger` component represents an event or state transition. They may have one or more `Effect` child nodes; whenever the trigger's criteria are met, all child effects are executed.
 
-Effects can do anything, such as enablind/disabling a component or calling a method on an action of some type.
+Effects interact with another component, such as enabling/disabling a component or starting an action.
 
 An example of a built-in triggers are `KeyEvent` and `LandedEvent`. An example of a built-in effect is `JumpEffect`, which calls the `Jump` method of a `JumpAction` or `JumpFallAction`.
 

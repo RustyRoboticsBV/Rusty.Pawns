@@ -10,13 +10,19 @@ namespace Rusty.Pawns;
 public abstract partial class PawnComponent : Node3D
 {
     /* Fields. */
+    [Export] private string alias = "";
+
     private bool initialized;
 
     /* Public properties. */
     /// <summary>
     /// The name of this pawn component.
     /// </summary>
-    [Export] public string Alias { get; protected set; } = "";
+    public string Alias
+    {
+        get => alias;
+        set => alias = value;
+    }
 
     /// <summary>
     /// The pawn that this pawn component belongs to.

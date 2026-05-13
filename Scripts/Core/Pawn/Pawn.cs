@@ -49,7 +49,7 @@ public sealed partial class Pawn : Node3D
 
     // Children.
     public ComponentCollection Components { get; private set; }
-    public Raycaster ActiveRaycaster { get; private set; }
+    public Raycaster ActiveRaycaster { get; private set; } // TODO: implement multiple raycasters.
 
     // Face direction.
     public bool IsFacingUp { get; set; } = true;
@@ -100,6 +100,19 @@ public sealed partial class Pawn : Node3D
         return Components.Get<T>();
     }
 
+    /// <summary>
+    /// Add a component to the pawn.
+    /// </summary>
+    public T AddComponent<T>(string alias = "")
+        where T : PawnComponent, new()
+    {
+        T component = new();
+        component.Alias = alias;
+        AddChild(component);
+        Components.Add(component);
+        return component;
+    }
+
     /* Godot overrides. */
     public override void _EnterTree()
     {
@@ -137,6 +150,7 @@ public sealed partial class Pawn : Node3D
         UpdateSurroundings();
 
         int actionCount = Components.Count<Action>();
+        int movementCount = Components.Count<MovementAction>();
         for (int i = 0; i < SubSteps; i++)
         {
             // Before update properties events.
@@ -172,11 +186,11 @@ public sealed partial class Pawn : Node3D
                     action.AfterUpdateProperties(deltaTime, this);
             }
 
-            // Update action accelerations.
-            for (int j = 0; j < actionCount; j++)
+            // Update movement action accelerations.
+            for (int j = 0; j < movementCount; j++)
             {
-                Action action = Components.GetAt<Action>(j);
-                if (action.IsActive(this) && action is MovementAction movement)
+                MovementAction movement = Components.GetAt<MovementAction>(j);
+                if (movement.IsActive(this))
                     movement.UpdateAcceleration(subDeltaTime, this);
             }
 
@@ -191,8 +205,8 @@ public sealed partial class Pawn : Node3D
             // Update actions' speed.
             for (int j = 0; j < actionCount; j++)
             {
-                Action action = Components.GetAt<Action>(j);
-                if (action.IsActive(this) && action is MovementAction movement)
+                MovementAction movement = Components.GetAt<MovementAction>(j);
+                if (movement.IsActive(this))
                     movement.UpdateSpeed(subDeltaTime, this);
             }
 
@@ -204,27 +218,27 @@ public sealed partial class Pawn : Node3D
                     action.AfterUpdateSpeed(deltaTime, this);
             }
 
-            // Update actions' movement.
+            // Update movement actions' distance.
             for (int j = 0; j < actionCount; j++)
             {
-                Action action = Components.GetAt<Action>(j);
-                if (action.IsActive(this) && action is MovementAction movement)
-                    movement.UpdateMovement(subDeltaTime, this);
+                MovementAction movement = Components.GetAt<MovementAction>(j);
+                if (movement.IsActive(this))
+                    movement.UpdateDistance(subDeltaTime, this);
             }
 
-            // After update movement events.
+            // After update distance events.
             for (int j = 0; j < actionCount; j++)
             {
                 Action action = Components.GetAt<Action>(j);
                 if (action.IsActive(this))
-                    action.AfterUpdateMovement(deltaTime, this);
+                    action.AfterUpdateDistance(deltaTime, this);
             }
 
             // Update actions' face direction.
             for (int j = 0; j < actionCount; j++)
             {
-                Action action = Components.GetAt<Action>(j);
-                if (action.IsActive(this) && action is MovementAction movement)
+                MovementAction movement = Components.GetAt<MovementAction>(j);
+                if (movement.IsActive(this))
                     movement.UpdateFaceDirection(subDeltaTime, this);
             }
 
@@ -237,10 +251,10 @@ public sealed partial class Pawn : Node3D
             }
 
             // Apply each action.
-            for (int j = 0; j < actionCount; j++)
+            for (int j = 0; j < movementCount; j++)
             {
-                Action action = Components.GetAt<Action>(j);
-                if (action.IsActive(this) && action is MovementAction movement)
+                MovementAction movement = Components.GetAt<MovementAction>(j);
+                if (movement.IsActive(this))
                 {
                     DoMove(movement.GetMovement(), true, movement.DescendsSlopes);
                     ApplyFacing(movement.GetFaceDirection());

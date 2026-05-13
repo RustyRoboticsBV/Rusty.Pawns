@@ -45,7 +45,7 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// <summary>
     /// Calculate the move distance for this update loop.
     /// </summary>
-    public abstract void UpdateMovement(double deltaTime, Pawn pawn);
+    public abstract void UpdateDistance(double deltaTime, Pawn pawn);
 
     /// <summary>
     /// Determine the face direction for this loop.

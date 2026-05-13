@@ -52,7 +52,7 @@ public abstract partial class MovementActionDirectional<T> : MovementAction
             CurrentSpeed = CalculateSpeed(deltaTime, pawn);
     }
 
-    public sealed override void UpdateMovement(double deltaTime, Pawn pawn)
+    public sealed override void UpdateDistance(double deltaTime, Pawn pawn)
     {
         if (CurrentProperties == null)
             CurrentMovement = 0f;
