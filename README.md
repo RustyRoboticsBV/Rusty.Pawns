@@ -36,3 +36,6 @@ Several types of components exist:
 - Triggers: Detect events or state changes and fire effects in response.
 - Effects: Execute behavior in response to triggers.
 - Conditions: Boolean checks that determine whether other components are active.
+
+## Documentation
+For a more in-depth description of concepts and classes, as well as how to get started, visit the [documentation pages](https://github.com/RustyRoboticsBV/Rusty.Pawns/wiki).
