@@ -10,7 +10,7 @@ public abstract partial class MovementActionY<T> : MovementAction
     where T : ActionProperties
 {
     /* Public constants. */
-    public static readonly Vector2 Up = new Vector2(Vector2.Up.X, Vector3.Up.X);
+    public static readonly Vector2 Up = new Vector2(Vector2.Up.X, Vector3.Up.Y);
 
     /* Public properties. */
     public T CurrentProperties { get; set; }
@@ -96,6 +96,11 @@ public abstract partial class MovementActionY<T> : MovementAction
     }
 
     /* Protected methods. */
+    protected static Acceleration GetDefaultGravity()
+    {
+        return (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
+    }
+
     /// <summary>
     /// Determine the properties for this update loop.
     /// </summary>
@@ -113,7 +118,7 @@ public abstract partial class MovementActionY<T> : MovementAction
     }
 
     /// <summary>
-    /// Determine the distance for this update loop.
+    /// Determine the speed for this update loop.
     /// </summary>
     protected virtual Speed CalculateSpeed(double deltaTime, Pawn pawn)
     {

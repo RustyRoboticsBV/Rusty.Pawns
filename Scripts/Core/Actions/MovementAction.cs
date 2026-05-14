@@ -125,4 +125,12 @@ public abstract partial class MovementAction : Action, IActionWithProperties
         }
         return null;
     }
+
+    /// <summary>
+    /// Print the current movement state.
+    /// </summary>
+    protected void PrintState()
+    {
+        GD.Print("Properties: " + GetProperties() + ", Acceleration: " + GetAcceleration() + ", Speed: " + GetSpeed() + ", Distance: " + GetMovement() + ", Facing: " + GetFaceDirection());
+    }
 }
