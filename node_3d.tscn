@@ -1,4 +1,4 @@
-[gd_scene load_steps=39 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=45 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
@@ -12,13 +12,16 @@
 [ext_resource type="Script" uid="uid://cgy2sky1blt5e" path="res://Scripts/BasicActions/Movement/FallProperties.cs" id="7_tereu"]
 [ext_resource type="Texture2D" uid="uid://775qgnk0id4a" path="res://Ground.png" id="8_4arys"]
 [ext_resource type="Script" uid="uid://d1l8xlmx3kw1v" path="res://Scripts/BasicActions/Movement/JumpProperties.cs" id="8_wlxy5"]
+[ext_resource type="Script" uid="uid://cq0gd4u1xne5a" path="res://Scripts/BasicActions/Movement/GrabAction.cs" id="11_2yde8"]
 [ext_resource type="Script" uid="uid://b42gml4r3m48x" path="res://Scripts/BasicActions/Movement/ClimbAction.cs" id="11_i0g27"]
 [ext_resource type="Script" uid="uid://b3pd4x8h31irp" path="res://Scripts/BasicActions/Modifiers/JumpFallModifier.cs" id="11_wlxy5"]
 [ext_resource type="Script" uid="uid://er7d8wjhjya1" path="res://Scripts/BasicActions/Conditions/Collision/IsGroundedCondition.cs" id="12_3v7ru"]
 [ext_resource type="Script" uid="uid://cbjuhd3tqokv3" path="res://Scripts/BasicActions/Movement/ClimbProperties.cs" id="12_ealrb"]
+[ext_resource type="Script" uid="uid://u87cgnbicg4k" path="res://Scripts/BasicActions/Movement/GrabProperties.cs" id="12_id0nj"]
 [ext_resource type="Script" uid="uid://cfs8syf4m0p71" path="res://Scripts/BasicActions/Conditions/Collision/IsAerialCondition.cs" id="13_3v7ru"]
 [ext_resource type="Script" uid="uid://dy24l112tlu5r" path="res://Scripts/BasicActions/Conditions/Collision/IsFacingWallCondition.cs" id="16_ealrb"]
 [ext_resource type="Script" uid="uid://b5kc1ygpwwjrw" path="res://Scripts/BasicActions/Conditions/State/ToggleCondition.cs" id="16_jsnrv"]
+[ext_resource type="Script" uid="uid://dfjhlexbddlr0" path="res://Scripts/BasicActions/Modifiers/WalkGrabModifier.cs" id="16_riyl1"]
 [ext_resource type="Script" uid="uid://be35t76fr3i1r" path="res://Scripts/BasicActions/Conditions/Collision/IsBelowCeilingCondition.cs" id="17_vxd74"]
 [ext_resource type="Script" uid="uid://dxadkn3jxjhu0" path="res://Scripts/BasicActions/Conditions/Logical/AndCondition.cs" id="18_jsnrv"]
 [ext_resource type="Script" uid="uid://cy32h6ng2fkwq" path="res://Scripts/BasicActions/Conditions/Logical/NotCondition.cs" id="19_lggff"]
@@ -27,6 +30,9 @@
 [ext_resource type="Script" uid="uid://cj5q0k716k3he" path="res://Scripts/BasicActions/Effects/JumpEffect.cs" id="23_5t8nk"]
 [ext_resource type="Script" uid="uid://c6ax1orl88l5" path="res://Scripts/BasicActions/Effects/EffectGroup.cs" id="23_nu31w"]
 [ext_resource type="Script" uid="uid://ffydawkn30v2" path="res://Scripts/BasicActions/Effects/CancelJumpEffect.cs" id="24_j3e5s"]
+[ext_resource type="Script" uid="uid://8q0xn247pvp1" path="res://Scripts/BasicActions/Triggers/GrabTrigger.cs" id="28_ype4i"]
+[ext_resource type="Script" uid="uid://cjkg33ak3pmk8" path="res://Scripts/BasicActions/Effects/GrabEffect.cs" id="29_riyl1"]
+[ext_resource type="Script" uid="uid://bwk5acjtge1wg" path="res://Scripts/BasicActions/Effects/GrabReleaseEffect.cs" id="30_pb8dk"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
 size = Vector3(1, 2, 1)
@@ -144,6 +150,14 @@ TopSpeed = 5.0
 Conditions = [NodePath("../../../Conditions/IsWallSliding")]
 metadata/_custom_type_script = "uid://cgy2sky1blt5e"
 
+[node name="Grab" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
+script = ExtResource("11_2yde8")
+metadata/_custom_type_script = "uid://cq0gd4u1xne5a"
+
+[node name="Properties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Grab"]
+script = ExtResource("12_id0nj")
+metadata/_custom_type_script = "uid://u87cgnbicg4k"
+
 [node name="Climb" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("11_i0g27")
 Conditions = [NodePath("../../Conditions/IsGrabbingWall")]
@@ -164,6 +178,12 @@ metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 script = ExtResource("11_wlxy5")
 Jump = NodePath("../../Movement/Jump")
 Fall = NodePath("../../Movement/Fall")
+
+[node name="GrabWalkModifier" type="Node3D" parent="SimplePlayerController/Pawn/Modifiers" node_paths=PackedStringArray("Walk", "Grab")]
+script = ExtResource("16_riyl1")
+Walk = NodePath("../../Movement/Walk")
+Grab = NodePath("../../Movement/Grab")
+metadata/_custom_type_script = "uid://dfjhlexbddlr0"
 
 [node name="Conditions" type="Node3D" parent="SimplePlayerController/Pawn"]
 script = ExtResource("4_tereu")
@@ -218,31 +238,49 @@ metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
 script = ExtResource("4_tereu")
 metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 
-[node name="JumpAndCancel" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("IsGroundedCondition", "JumpEffect", "CancelJumpEffect")]
+[node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("IsGroundedCondition", "CancelEffect", "InvokeEffect")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
 script = ExtResource("22_dhlwf")
 IsGroundedCondition = NodePath("../../Conditions/IsGrounded")
-JumpEffect = NodePath("Jump")
-CancelJumpEffect = NodePath("Cancel")
+CancelEffect = NodePath("Cancel")
+InvokeEffect = NodePath("Invoke")
 metadata/_custom_type_script = "uid://um220quwve4g"
 
-[node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel"]
+[node name="Invoke" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump"]
 script = ExtResource("23_nu31w")
 metadata/_custom_type_script = "uid://c6ax1orl88l5"
 
-[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel/Jump" node_paths=PackedStringArray("Action")]
+[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump/Invoke" node_paths=PackedStringArray("Action")]
 script = ExtResource("23_5t8nk")
 Action = NodePath("../../../../Movement/Jump")
 metadata/_custom_type_script = "uid://cj5q0k716k3he"
 
-[node name="Cancel" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel"]
+[node name="Cancel" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump"]
 script = ExtResource("23_nu31w")
 metadata/_custom_type_script = "uid://c6ax1orl88l5"
 
-[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel/Cancel" node_paths=PackedStringArray("Action")]
+[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump/Cancel" node_paths=PackedStringArray("Action")]
 script = ExtResource("24_j3e5s")
 Action = NodePath("../../../../Movement/Jump")
 metadata/_custom_type_script = "uid://ffydawkn30v2"
+
+[node name="GrabTrigger" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("CancelEffect", "InvokeEffect")]
+script = ExtResource("28_ype4i")
+GrabDistance = 50.0
+CancelEffect = NodePath("GrabReleaseEffect")
+InvokeEffect = NodePath("GrabEffect")
+metadata/_custom_type_script = "uid://8q0xn247pvp1"
+
+[node name="GrabEffect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/GrabTrigger" node_paths=PackedStringArray("Action")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("29_riyl1")
+Action = NodePath("../../../Movement/Grab")
+metadata/_custom_type_script = "uid://cjkg33ak3pmk8"
+
+[node name="GrabReleaseEffect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/GrabTrigger" node_paths=PackedStringArray("Action")]
+script = ExtResource("30_pb8dk")
+Action = NodePath("../../../Movement/Grab")
+metadata/_custom_type_script = "uid://bwk5acjtge1wg"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

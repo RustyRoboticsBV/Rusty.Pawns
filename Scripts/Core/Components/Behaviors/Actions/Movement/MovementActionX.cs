@@ -97,6 +97,30 @@ public abstract partial class MovementActionX<T> : MovementAction
 
     /* Protected methods. */
     /// <summary>
+    /// Aim a speed value left or right.
+    /// </summary>
+    protected Speed AimSpeed(Speed speed, bool left)
+    {
+        if (left && speed > 0f)
+            return -speed;
+        else if (!left && speed < 0f)
+            return -speed;
+        else
+            return speed;
+    }
+
+    protected Speed LimitSpeed(Speed speed, Speed topSpeed)
+    {
+        topSpeed = topSpeed.Abs();
+        if (speed > topSpeed)
+            return topSpeed;
+        else if (speed < -topSpeed)
+            return -topSpeed;
+        else
+            return speed;
+    }
+
+    /// <summary>
     /// Determine the properties for this update loop.
     /// </summary>
     protected virtual T CalculateProperties(double deltaTime, Pawn pawn)

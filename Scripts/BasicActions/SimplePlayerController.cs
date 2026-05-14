@@ -37,7 +37,7 @@ public partial class SimplePlayerController : PawnDriver
             {
                 if (!Grab)
                 {
-                    Pawn.GetComponent<ToggleCondition>("IsGrabbing").State = true;
+                    Pawn.GetComponent<GrabTrigger>().TryGrab();
                     Grab = true;
                 }
             }
@@ -45,7 +45,7 @@ public partial class SimplePlayerController : PawnDriver
             {
                 if (Grab)
                 {
-                    Pawn.GetComponent<ToggleCondition>("IsGrabbing").State = false;
+                    Pawn.GetComponent<GrabTrigger>().TryRelease();
                     Grab = false;
                 }
             }

@@ -3,15 +3,13 @@ using Godot;
 using Rusty.Pawns;
 
 [GlobalClass]
-public partial class JumpTrigger : Trigger
+public partial class JumpTrigger : CancelTrigger
 {
     /* Public properties. */
     [Export] public int Jumps { get; set; } = 2;
     [Export] public float CoyoteTime { get; set; } = 0.083f;
     [Export] public float BufferTime { get; set; } = 0.083f;
     [Export] public IsGroundedCondition IsGroundedCondition { get; set; }
-    [Export] public Effect JumpEffect { get; set; }
-    [Export] public Effect CancelJumpEffect { get; set; }
 
     /* Private properties. */
     private int JumpsLeft { get; set; }
@@ -60,7 +58,7 @@ public partial class JumpTrigger : Trigger
         {
             if (JumpsLeft > 0)
             {
-                JumpEffect.Invoke(deltaTime);
+                InvokeEffect.Invoke(deltaTime);
                 JumpsLeft--;
                 BufferTimeLeft = 0f;
             }
@@ -68,7 +66,7 @@ public partial class JumpTrigger : Trigger
         }
         if (MustCancel)
         {
-            CancelJumpEffect.Invoke(deltaTime);
+            CancelEffect.Invoke(deltaTime);
             MustCancel = false;
         }
     }

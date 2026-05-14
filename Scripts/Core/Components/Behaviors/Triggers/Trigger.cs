@@ -8,6 +8,9 @@ namespace Rusty.Pawns;
 [GlobalClass, Icon("./Trigger.svg")]
 public abstract partial class Trigger : PawnBehavior
 {
+    /* Public properties. */
+    [Export] public Effect InvokeEffect { get; set; }
+
     /* Public methods. */
     /// <summary>
     /// Called at the start of the update loop.
