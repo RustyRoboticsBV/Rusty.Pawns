@@ -11,8 +11,8 @@ public sealed partial class NotCondition : Condition
     /* Public properties. */
     [Export] public Condition Condition { get; set; }
 
-    /* Public methods. */
-    public override bool Evaluate(Pawn pawn)
+    /* Protected methods. */
+    protected override bool EvaluateMe(Pawn pawn)
     {
         return !Condition.Evaluate(pawn);
     }

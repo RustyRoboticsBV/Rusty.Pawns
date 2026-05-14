@@ -47,7 +47,7 @@ public partial class SimplePlayerController : Node3D
 
     public override void _Process(double delta)
     {
-        if (Pawn.CheckCondition("IsGrounded") && !Pawn.GetComponent<JumpAction>().IsJumping)
+        if (Pawn.CheckCondition<IsGroundedCondition>() && !Pawn.GetComponent<JumpAction>().IsJumping)
         {
             JumpsLeft = Jumps;
             CoyoteTimeLeft = CoyoteTime;

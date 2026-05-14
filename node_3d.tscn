@@ -14,7 +14,7 @@
 [ext_resource type="Script" uid="uid://d1l8xlmx3kw1v" path="res://Scripts/BasicActions/JumpProperties.cs" id="8_wlxy5"]
 [ext_resource type="Script" uid="uid://dieqd3nu81uba" path="res://Scripts/BasicActions/JumpFallModifier.cs" id="11_wlxy5"]
 [ext_resource type="Script" uid="uid://er7d8wjhjya1" path="res://Scripts/BasicActions/Conditions/Collision/IsGroundedCondition.cs" id="12_3v7ru"]
-[ext_resource type="Script" uid="uid://cy32h6ng2fkwq" path="res://Scripts/BasicActions/Conditions/Logical/NotCondition.cs" id="13_tcnuu"]
+[ext_resource type="Script" uid="uid://cfs8syf4m0p71" path="res://Scripts/BasicActions/Conditions/Collision/IsAerialCondition.cs" id="13_3v7ru"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
 size = Vector3(1, 2, 1)
@@ -141,10 +141,9 @@ metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 script = ExtResource("12_3v7ru")
 metadata/_custom_type_script = "uid://er7d8wjhjya1"
 
-[node name="IsAerial" type="Node3D" parent="SimplePlayerController/Pawn/Conditions" node_paths=PackedStringArray("Condition")]
-script = ExtResource("13_tcnuu")
-Condition = NodePath("../IsGrounded")
-metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
+[node name="IsAerial" type="Node3D" parent="SimplePlayerController/Pawn/Conditions"]
+script = ExtResource("13_3v7ru")
+metadata/_custom_type_script = "uid://cfs8syf4m0p71"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

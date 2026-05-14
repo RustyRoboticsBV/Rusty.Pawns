@@ -8,9 +8,24 @@ namespace Rusty.Pawns;
 [GlobalClass, Icon("./Condition.svg")]
 public abstract partial class Condition : PawnComponent
 {
+    /* Public properties. */
+    [Export] public bool InvertResult { get; set; }
+
     /* Public methods. */
     /// <summary>
     /// Check if this condition holds true.
     /// </summary>
-    public abstract bool Evaluate(Pawn pawn);
+    public bool Evaluate(Pawn pawn)
+    {
+        if (InvertResult)
+            return !EvaluateMe(pawn);
+        else
+            return EvaluateMe(pawn);
+    }
+
+    /* Protected methods. */
+    /// <summary>
+    /// Run the evaluation logic.
+    /// </summary>
+    protected abstract bool EvaluateMe(Pawn pawn);
 }

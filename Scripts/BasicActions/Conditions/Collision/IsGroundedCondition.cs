@@ -8,8 +8,8 @@ namespace Rusty.Pawns;
 [GlobalClass, Icon("./IsGroundedCondition.svg")]
 public sealed partial class IsGroundedCondition : Condition
 {
-    /* Public methods. */
-    public override bool Evaluate(Pawn pawn)
+    /* Protected methods. */
+    protected override bool EvaluateMe(Pawn pawn)
     {
         return pawn.BelowAdjacent.IsGround;
     }
