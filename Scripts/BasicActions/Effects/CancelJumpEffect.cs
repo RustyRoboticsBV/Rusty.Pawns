@@ -1,9 +1,9 @@
-using Godot;
+﻿using Godot;
 
 namespace Rusty.Pawns;
 
 /// <summary>
-/// A trigger effect that cancels a jump movement action.
+/// A cancel jump effect.
 /// </summary>
 [GlobalClass]
 public sealed partial class CancelJumpEffect : Effect

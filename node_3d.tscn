@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=39 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
@@ -23,9 +23,10 @@
 [ext_resource type="Script" uid="uid://dxadkn3jxjhu0" path="res://Scripts/BasicActions/Conditions/Logical/AndCondition.cs" id="18_jsnrv"]
 [ext_resource type="Script" uid="uid://cy32h6ng2fkwq" path="res://Scripts/BasicActions/Conditions/Logical/NotCondition.cs" id="19_lggff"]
 [ext_resource type="Script" uid="uid://ckkc3d17vhov2" path="res://Scripts/BasicActions/Conditions/Movement/HasSpeedCondition.cs" id="20_s0gvp"]
+[ext_resource type="Script" uid="uid://um220quwve4g" path="res://Scripts/BasicActions/Triggers/JumpTrigger.cs" id="22_dhlwf"]
 [ext_resource type="Script" uid="uid://cj5q0k716k3he" path="res://Scripts/BasicActions/Effects/JumpEffect.cs" id="23_5t8nk"]
-[ext_resource type="Script" uid="uid://bxbqjn1jsr2om" path="res://Scripts/BasicActions/Triggers/ManualTrigger.cs" id="24_dhlwf"]
-[ext_resource type="Script" uid="uid://b2fvsv1kq0eu7" path="res://Scripts/BasicActions/Effects/CancelJumpEffect.cs" id="24_j3e5s"]
+[ext_resource type="Script" uid="uid://c6ax1orl88l5" path="res://Scripts/BasicActions/Effects/EffectGroup.cs" id="23_nu31w"]
+[ext_resource type="Script" uid="uid://ffydawkn30v2" path="res://Scripts/BasicActions/Effects/CancelJumpEffect.cs" id="24_j3e5s"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
 size = Vector3(1, 2, 1)
@@ -217,24 +218,31 @@ metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
 script = ExtResource("4_tereu")
 metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 
-[node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers"]
+[node name="JumpAndCancel" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("IsGroundedCondition", "JumpEffect", "CancelJumpEffect")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
-script = ExtResource("24_dhlwf")
-metadata/_custom_type_script = "uid://bxbqjn1jsr2om"
+script = ExtResource("22_dhlwf")
+IsGroundedCondition = NodePath("../../Conditions/IsGrounded")
+JumpEffect = NodePath("Jump")
+CancelJumpEffect = NodePath("Cancel")
+metadata/_custom_type_script = "uid://um220quwve4g"
 
-[node name="Effect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump" node_paths=PackedStringArray("Action")]
+[node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel"]
+script = ExtResource("23_nu31w")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
+
+[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel/Jump" node_paths=PackedStringArray("Action")]
 script = ExtResource("23_5t8nk")
-Action = NodePath("../../../Movement/Jump")
+Action = NodePath("../../../../Movement/Jump")
 metadata/_custom_type_script = "uid://cj5q0k716k3he"
 
-[node name="CancelJump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers"]
-script = ExtResource("24_dhlwf")
-metadata/_custom_type_script = "uid://bxbqjn1jsr2om"
+[node name="Cancel" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel"]
+script = ExtResource("23_nu31w")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
 
-[node name="Effect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/CancelJump" node_paths=PackedStringArray("Action")]
+[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/JumpAndCancel/Cancel" node_paths=PackedStringArray("Action")]
 script = ExtResource("24_j3e5s")
-Action = NodePath("../../../Movement/Jump")
-metadata/_custom_type_script = "uid://b2fvsv1kq0eu7"
+Action = NodePath("../../../../Movement/Jump")
+metadata/_custom_type_script = "uid://ffydawkn30v2"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

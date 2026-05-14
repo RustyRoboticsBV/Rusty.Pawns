@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 
 namespace Rusty.Pawns;
 
@@ -13,21 +12,5 @@ public abstract partial class Trigger : PawnBehavior
     /// <summary>
     /// Called at the start of the update loop.
     /// </summary>
-    public void TryInvoke(double deltaTime)
-    {
-        if (Check(deltaTime))
-        {
-            for (int i = 0; i < GetChildCount(); i++)
-            {
-                if (GetChild(i) is Effect effect)
-                    effect.Invoke(deltaTime);
-            }
-        }
-    }
-
-    /* Protected methods. */
-    /// <summary>
-    /// Check if this trigger's effects must be invoked.
-    /// </summary>
-    protected abstract bool Check(double deltaTime);
+    public abstract void TryInvoke(double deltaTime);
 }

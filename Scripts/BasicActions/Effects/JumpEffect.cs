@@ -3,7 +3,7 @@ using Godot;
 namespace Rusty.Pawns;
 
 /// <summary>
-/// A trigger effect that starts a jump movement action.
+/// A jump effect.
 /// </summary>
 [GlobalClass]
 public sealed partial class JumpEffect : Effect

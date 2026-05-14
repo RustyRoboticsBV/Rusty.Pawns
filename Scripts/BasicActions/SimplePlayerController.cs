@@ -5,59 +5,48 @@ namespace Rusty.Pawns.Examples;
 [GlobalClass]
 public partial class SimplePlayerController : PawnDriver
 {
-    /* Public properties. */
-    [Export] int Jumps { get; set; } = 2;
-    [Export] float CoyoteTime { get; set; } = 0.0833f;
-
     /* Private methods. */
     private float MoveX { get; set; }
-    private bool Jump { get; set; }
-    private int JumpsLeft { get; set; }
-    private float CoyoteTimeLeft { get; set; }
-    private bool Grabbing { get; set; }
     private float MoveY { get; set; }
+    private bool Jump { get; set; }
+    private bool Grab { get; set; }
 
     /* Godot overrides. */
-    public override void _EnterTree()
-    {
-        JumpsLeft = Jumps;
-        CoyoteTimeLeft = CoyoteTime;
-    }
-
     public override void _Input(InputEvent @event)
     {
         if (@event is InputEventKey key)
         {
             if (Input.IsKeyPressed(Key.Z))
             {
-                if (!Jump && JumpsLeft > 0)
+                if (!Jump)
                 {
-                    Pawn.GetComponent<ManualTrigger>("Jump").Activate();
-                    JumpsLeft--;
+                    Pawn.GetComponent<JumpTrigger>().TryJump();
+                    Jump = true;
                 }
-                Jump = true;
             }
             else
             {
                 if (Jump)
-                    Pawn.GetComponent<ManualTrigger>("CancelJump").Activate();
-                Jump = false;
+                {
+                    Pawn.GetComponent<JumpTrigger>().TryCancel();
+                    Jump = false;
+                }
             }
 
             if (Input.IsKeyPressed(Key.Ctrl))
             {
-                if (!Grabbing)
+                if (!Grab)
                 {
                     Pawn.GetComponent<ToggleCondition>("IsGrabbing").State = true;
-                    Grabbing = true;
+                    Grab = true;
                 }
             }
             else
             {
-                if (Grabbing)
+                if (Grab)
                 {
                     Pawn.GetComponent<ToggleCondition>("IsGrabbing").State = false;
-                    Grabbing = false;
+                    Grab = false;
                 }
             }
         }
@@ -65,22 +54,6 @@ public partial class SimplePlayerController : PawnDriver
 
     public override void _Process(double delta)
     {
-        if (Pawn.CheckCondition<IsGroundedCondition>() && !Pawn.GetComponent<JumpAction>().IsJumping)
-        {
-            JumpsLeft = Jumps;
-            CoyoteTimeLeft = CoyoteTime;
-        }
-        else if (JumpsLeft == Jumps)
-        {
-            if (CoyoteTimeLeft <= 0)
-            {
-                JumpsLeft--;
-                CoyoteTimeLeft = CoyoteTime;
-            }
-            else
-                CoyoteTimeLeft -= (float)delta;
-        }
-
         MoveX = 0f;
         if (Input.IsKeyPressed(Key.Left))
             MoveX -= 1f;
