@@ -140,7 +140,6 @@ public sealed partial class Pawn : Node3D
         for (int i = 0; i < Components.Count<PawnComponent>(); i++)
         {
             Components.GetAt<PawnComponent>(i).Init(this);
-            GD.Print("! Initializing: " + Components.GetAt<PawnComponent>(i).Name);
         }
     }
 

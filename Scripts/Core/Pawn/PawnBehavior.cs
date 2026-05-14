@@ -6,8 +6,8 @@ namespace Rusty.Pawns;
 /// <summary>
 /// Base class for pawn component nodes that contain a conditions list and an enabled toggle.
 /// </summary>
-[GlobalClass, Icon("./Behavior.svg")]
-public abstract partial class Behavior : PawnComponent
+[GlobalClass, Icon("./PawnBehavior.svg")]
+public abstract partial class PawnBehavior : PawnComponent
 {
     /* Public properties. */
     /// <summary>
@@ -23,6 +23,10 @@ public abstract partial class Behavior : PawnComponent
     public override bool IsActive(Pawn pawn)
     {
         if (!Enabled)
+            return false;
+
+        PawnComponent parent = GetParentComponent();
+        if (parent is Group && !parent.IsActive(pawn))
             return false;
 
         foreach (Condition condition in Conditions)

@@ -71,6 +71,22 @@ public abstract partial class PawnComponent : Node3D
     /// </summary>
     protected virtual void OnInit(Pawn pawn) { }
 
+    /// <summary>
+    /// Get the parent pawn component. Returns null if there is no parent component.
+    /// </summary>
+    protected PawnComponent GetParentComponent()
+    {
+        Node parent = GetParent();
+        while (parent != null)
+        {
+            if (parent is PawnComponent component)
+                return component;
+            else
+                parent = parent.GetParent();
+        }
+        return null;
+    }
+
     /* Private methods. */
     /// <summary>
     /// Get the path to the pawn component from the root pawn (or the scene root if there is no pawn).

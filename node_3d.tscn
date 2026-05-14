@@ -1,10 +1,11 @@
-[gd_scene load_steps=22 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=23 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
 [ext_resource type="Script" uid="uid://3qdjw51711mm" path="res://Scripts/Core/Raycasters/RaycastBox.cs" id="3_i5arm"]
 [ext_resource type="Script" uid="uid://c6d8wnkdq05kb" path="res://Scripts/BasicActions/WalkAction.cs" id="3_jka67"]
 [ext_resource type="Script" uid="uid://b04sx7q872ytp" path="res://Scripts/BasicActions/WalkProperties.cs" id="4_r3fl7"]
+[ext_resource type="Script" uid="uid://cxkdxsl31ur4a" path="res://Scripts/Core/Group.cs" id="4_tereu"]
 [ext_resource type="Script" uid="uid://ch2pl3kf75oio" path="res://Scripts/BasicActions/FallAction.cs" id="6_6iypd"]
 [ext_resource type="Script" uid="uid://dxjwwdeqs80r4" path="res://AutoRotate.cs" id="6_i5arm"]
 [ext_resource type="Texture2D" uid="uid://dmybuwcpod8x1" path="res://Background.png" id="7_jsk3o"]
@@ -59,21 +60,23 @@ metadata/_custom_type_script = "uid://kl8e2pf3srga"
 script = ExtResource("3_i5arm")
 metadata/_custom_type_script = "uid://3qdjw51711mm"
 
-[node name="Actions" type="Node3D" parent="SimplePlayerController/Pawn"]
+[node name="Movement" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("4_tereu")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 
-[node name="WalkAction" type="Node3D" parent="SimplePlayerController/Pawn/Actions"]
+[node name="Walk" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
 script = ExtResource("3_jka67")
 metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
 
-[node name="WalkProperties" type="Node3D" parent="SimplePlayerController/Pawn/Actions/WalkAction"]
+[node name="WalkProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk"]
 script = ExtResource("4_r3fl7")
 metadata/_custom_type_script = "uid://b04sx7q872ytp"
 
-[node name="FallAction" type="Node3D" parent="SimplePlayerController/Pawn/Actions"]
+[node name="Fall" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
 script = ExtResource("6_6iypd")
 metadata/_custom_type_script = "uid://ch2pl3kf75oio"
 
-[node name="FallProperties" type="Node3D" parent="SimplePlayerController/Pawn/Actions/FallAction"]
+[node name="FallProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Fall"]
 script = ExtResource("7_tereu")
 GravityMultiplier = 5.5
 metadata/_custom_type_script = "uid://cgy2sky1blt5e"

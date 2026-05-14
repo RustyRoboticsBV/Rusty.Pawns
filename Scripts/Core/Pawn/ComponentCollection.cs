@@ -155,14 +155,10 @@ public class ComponentCollection
         {
             Node node = root.GetChild(i);
             if (node is PawnComponent component)
-            {
-                GD.Print("- Adding: " + node.Name);
                 Add(component);
-            }
 
             if (node is not Pawn pawn)
                 Scan(node);
         }
     }
-
 }

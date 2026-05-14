@@ -6,7 +6,7 @@ namespace Rusty.Pawns;
 /// A base class for all pawn action properties.
 /// </summary>
 [GlobalClass, Icon("./ActionProperties.svg")]
-public abstract partial class ActionProperties : Behavior
+public abstract partial class ActionProperties : PawnBehavior
 {
     /* Public methods. */
     /// <summary>

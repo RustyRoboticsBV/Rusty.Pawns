@@ -6,7 +6,7 @@ namespace Rusty.Pawns;
 /// A base class for all pawn triggers.
 /// </summary>
 [GlobalClass, Icon("./Trigger.svg")]
-public abstract partial class Trigger : Behavior
+public abstract partial class Trigger : PawnBehavior
 {
     /* Public methods. */
     /// <summary>

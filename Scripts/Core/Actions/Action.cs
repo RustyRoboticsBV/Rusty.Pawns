@@ -7,7 +7,7 @@ namespace Rusty.Pawns;
 /// Base class for pawn actions.
 /// </summary>
 [GlobalClass, Icon("./Action.svg")]
-public abstract partial class Action : Behavior
+public abstract partial class Action : PawnBehavior
 {
     /* Public methods. */
     /// <summary>
