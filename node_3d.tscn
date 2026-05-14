@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=27 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
@@ -7,13 +7,17 @@
 [ext_resource type="Script" uid="uid://b04sx7q872ytp" path="res://Scripts/BasicActions/WalkProperties.cs" id="4_r3fl7"]
 [ext_resource type="Script" uid="uid://cxkdxsl31ur4a" path="res://Scripts/Core/Group.cs" id="4_tereu"]
 [ext_resource type="Script" uid="uid://ch2pl3kf75oio" path="res://Scripts/BasicActions/FallAction.cs" id="6_6iypd"]
-[ext_resource type="Script" uid="uid://dxjwwdeqs80r4" path="res://AutoRotate.cs" id="6_i5arm"]
 [ext_resource type="Script" uid="uid://b4ucxfyypd30e" path="res://Scripts/BasicActions/JumpAction.cs" id="7_imku0"]
 [ext_resource type="Texture2D" uid="uid://dmybuwcpod8x1" path="res://Background.png" id="7_jsk3o"]
 [ext_resource type="Script" uid="uid://cgy2sky1blt5e" path="res://Scripts/BasicActions/FallProperties.cs" id="7_tereu"]
 [ext_resource type="Texture2D" uid="uid://775qgnk0id4a" path="res://Ground.png" id="8_4arys"]
 [ext_resource type="Script" uid="uid://d1l8xlmx3kw1v" path="res://Scripts/BasicActions/JumpProperties.cs" id="8_wlxy5"]
 [ext_resource type="Script" uid="uid://dieqd3nu81uba" path="res://Scripts/BasicActions/JumpFallModifier.cs" id="11_wlxy5"]
+[ext_resource type="Script" uid="uid://er7d8wjhjya1" path="res://Scripts/BasicActions/Conditions/Collision/IsGroundedCondition.cs" id="12_3v7ru"]
+[ext_resource type="Script" uid="uid://cy32h6ng2fkwq" path="res://Scripts/BasicActions/Conditions/Logical/NotCondition.cs" id="13_tcnuu"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
+size = Vector3(1, 2, 1)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6iypd"]
 
@@ -24,10 +28,6 @@ sky_material = SubResource("ProceduralSkyMaterial_6iypd")
 background_mode = 2
 sky = SubResource("Sky_tereu")
 ambient_light_source = 3
-
-[sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_wc5p8"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_imku0"]
 
@@ -47,9 +47,12 @@ uv1_scale = Vector3(100, 10, 10)
 albedo_texture = ExtResource("8_4arys")
 uv1_scale = Vector3(5, 5, 5)
 
+[sub_resource type="QuadMesh" id="QuadMesh_tcnuu"]
+
 [node name="Node3D" type="Node3D"]
 
 [node name="SimplePlayerController" type="Node3D" parent="." node_paths=PackedStringArray("Pawn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1788688, 0)
 script = ExtResource("1_a0tk4")
 Pawn = NodePath("Pawn")
 metadata/_custom_type_script = "uid://qln580dj5gv5"
@@ -59,8 +62,14 @@ script = ExtResource("2_r3fl7")
 MovementTargetNode = NodePath("..")
 metadata/_custom_type_script = "uid://kl8e2pf3srga"
 
-[node name="RaycastBox" type="Node3D" parent="SimplePlayerController/Pawn"]
+[node name="Raycasters" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("4_tereu")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="RaycastBox" type="Node3D" parent="SimplePlayerController/Pawn/Raycasters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("3_i5arm")
+Size = Vector2(1, 2)
 metadata/_custom_type_script = "uid://3qdjw51711mm"
 
 [node name="Movement" type="Node3D" parent="SimplePlayerController/Pawn"]
@@ -71,16 +80,39 @@ metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 script = ExtResource("3_jka67")
 metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
 
-[node name="WalkProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk"]
+[node name="GroundWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("4_r3fl7")
+AccelerationTime = 0.032
+DecelerationTime = 0.048
+TurnTime = 0.048
+Conditions = [NodePath("../../../Conditions/IsGrounded")]
 metadata/_custom_type_script = "uid://b04sx7q872ytp"
 
-[node name="JumpAction" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
+[node name="AirWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("4_r3fl7")
+AccelerationTime = 0.048
+DecelerationTime = 0.064
+Conditions = [NodePath("../../../Conditions/IsAerial")]
+metadata/_custom_type_script = "uid://b04sx7q872ytp"
+
+[node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
 script = ExtResource("7_imku0")
 metadata/_custom_type_script = "uid://b4ucxfyypd30e"
 
-[node name="JumpProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/JumpAction"]
+[node name="GroundJump" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Jump" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("8_wlxy5")
+Height = 5.5
+GravityMultiplier = 10.0
+CancelledGravityMultiplier = 40.0
+Conditions = [NodePath("../../../Conditions/IsGrounded")]
+metadata/_custom_type_script = "uid://d1l8xlmx3kw1v"
+
+[node name="AirJump" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Jump" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("8_wlxy5")
+Height = 4.5
+GravityMultiplier = 11.0
+CancelledGravityMultiplier = 22.0
+Conditions = [NodePath("../../../Conditions/IsAerial")]
 metadata/_custom_type_script = "uid://d1l8xlmx3kw1v"
 
 [node name="Fall" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
@@ -89,66 +121,113 @@ metadata/_custom_type_script = "uid://ch2pl3kf75oio"
 
 [node name="FallProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Fall"]
 script = ExtResource("7_tereu")
-GravityMultiplier = 5.5
 metadata/_custom_type_script = "uid://cgy2sky1blt5e"
 
 [node name="Modifiers" type="Node3D" parent="SimplePlayerController/Pawn"]
 script = ExtResource("4_tereu")
 metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 
-[node name="JumpFallModifier" type="Node3D" parent="SimplePlayerController/Pawn/Modifiers" node_paths=PackedStringArray("Jump", "Fall")]
+[node name="JumpFall" type="Node3D" parent="SimplePlayerController/Pawn/Modifiers" node_paths=PackedStringArray("Jump", "Fall")]
 script = ExtResource("11_wlxy5")
-Jump = NodePath("../../Movement/JumpAction")
+Jump = NodePath("../../Movement/Jump")
 Fall = NodePath("../../Movement/Fall")
 metadata/_custom_type_script = "uid://dieqd3nu81uba"
 
+[node name="Conditions" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("4_tereu")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="IsGrounded" type="Node3D" parent="SimplePlayerController/Pawn/Conditions"]
+script = ExtResource("12_3v7ru")
+metadata/_custom_type_script = "uid://er7d8wjhjya1"
+
+[node name="IsAerial" type="Node3D" parent="SimplePlayerController/Pawn/Conditions" node_paths=PackedStringArray("Condition")]
+script = ExtResource("13_tcnuu")
+Condition = NodePath("../IsGrounded")
+metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_i5arm")
+skeleton = NodePath("../Pawn")
+
 [node name="Camera3D" type="Camera3D" parent="SimplePlayerController"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 11.897)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 11.897)
 environment = SubResource("Environment_cdqbm")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SimplePlayerController/Camera3D"]
 transform = Transform3D(0.09531717, 0.6510385, -0.7530361, 0.13872692, 0.7404107, 0.6576828, 0.98573285, -0.16715482, -0.019742668, 0, 0, 0)
 shadow_enabled = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
-mesh = SubResource("BoxMesh_i5arm")
-skeleton = NodePath("../Pawn")
+[node name="Level" type="Node3D" parent="."]
 
-[node name="AutoRotate" type="Node3D" parent="."]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 1, -1.4412879, 6.0300584, -5.331307)
-visible = false
-script = ExtResource("6_i5arm")
-MoveSpeed = 5.0
-metadata/_custom_type_script = "uid://dxjwwdeqs80r4"
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="AutoRotate"]
-transform = Transform3D(0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0, 1, 0, 0, 0)
-mesh = SubResource("BoxMesh_wc5p8")
-skeleton = NodePath("../..")
-
-[node name="Bg" type="MeshInstance3D" parent="."]
+[node name="Bg" type="MeshInstance3D" parent="Level"]
 transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 1, 0, 0, -6.4392138)
 mesh = SubResource("QuadMesh_imku0")
+skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_wlxy5")
 
-[node name="Solid" type="MeshInstance3D" parent="."]
+[node name="Solid" type="MeshInstance3D" parent="Level"]
 transform = Transform3D(100, 0, 0, 0, 10, 0, 0, 0, 10, 0, -5.5704765, 0)
 mesh = SubResource("BoxMesh_3v7ru")
+skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_tcnuu")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Solid"]
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Solid"]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Solid/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Solid/StaticBody3D"]
 transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
 shape = SubResource("BoxShape3D_jsk3o")
 
-[node name="Solid2" type="MeshInstance3D" parent="."]
+[node name="Solid2" type="MeshInstance3D" parent="Level"]
 transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 5.2190037, -0.22055626, 0)
 mesh = SubResource("BoxMesh_3v7ru")
 skeleton = NodePath("../Solid")
 surface_material_override/0 = SubResource("StandardMaterial3D_4arys")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Solid2"]
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Solid2"]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Solid2/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Solid2/StaticBody3D"]
 shape = SubResource("BoxShape3D_jsk3o")
+
+[node name="Node3D" type="Node3D" parent="Level"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")
+
+[node name="MeshInstance3D7" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")
+
+[node name="MeshInstance3D8" type="MeshInstance3D" parent="Level/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, 0)
+mesh = SubResource("QuadMesh_tcnuu")
+skeleton = NodePath("../../..")

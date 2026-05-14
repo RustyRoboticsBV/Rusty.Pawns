@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8xiudq0c35xb"
-path="res://.godot/imported/XorCondition.svg-6f30a65edda82f2a67f38fe5bf8c574f.ctex"
+uid="uid://dwr4ypkheqdh7"
+path="res://.godot/imported/NotCondition.svg-373a219054760a8e05b6043c54f1567a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/Core/Conditions/XorCondition.svg"
-dest_files=["res://.godot/imported/XorCondition.svg-6f30a65edda82f2a67f38fe5bf8c574f.ctex"]
+source_file="res://Scripts/BasicActions/Conditions/Logical/NotCondition.svg"
+dest_files=["res://.godot/imported/NotCondition.svg-373a219054760a8e05b6043c54f1567a.ctex"]
 
 [params]
 

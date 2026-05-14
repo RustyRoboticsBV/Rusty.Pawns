@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dglrf7y0kk5rg"
-path="res://.godot/imported/AndCondition.svg-7b4c8d0ce7fe0842a9acbc4a9193c01d.ctex"
+uid="uid://f25y3f8yia8x"
+path="res://.godot/imported/IsGroundedCondition.svg-f90f5513caf401448dd9a684984f6b4f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/Core/Conditions/AndCondition.svg"
-dest_files=["res://.godot/imported/AndCondition.svg-7b4c8d0ce7fe0842a9acbc4a9193c01d.ctex"]
+source_file="res://Scripts/BasicActions/Conditions/Collision/IsGroundedCondition.svg"
+dest_files=["res://.godot/imported/IsGroundedCondition.svg-f90f5513caf401448dd9a684984f6b4f.ctex"]
 
 [params]
 

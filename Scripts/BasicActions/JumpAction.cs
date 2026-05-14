@@ -9,6 +9,9 @@ namespace Rusty.Pawns;
 [GlobalClass, Icon("./JumpAction.svg")]
 public sealed partial class JumpAction : MovementActionY<JumpProperties>
 {
+    /* Public properties. */
+    public bool IsJumping => MustStart || CurrentSpeed > 0f;
+
     /* Private properties. */
     private bool MustStart { get; set; }
     private bool LowJump { get; set; }
@@ -16,13 +19,17 @@ public sealed partial class JumpAction : MovementActionY<JumpProperties>
     /* Public methods. */
     public void Jump()
     {
-        MustStart = true;
-        LowJump = false;
+        if (CurrentProperties != null)
+        {
+            MustStart = true;
+            LowJump = false;
+        }
     }
 
     public void CancelJump()
     {
-        LowJump = true;
+        if (IsJumping)
+            LowJump = true;
     }
 
     public override void ForceStop()
@@ -33,6 +40,14 @@ public sealed partial class JumpAction : MovementActionY<JumpProperties>
     }
 
     /* Protected methods. */
+    protected override JumpProperties CalculateProperties(double deltaTime, Pawn pawn)
+    {
+        if (!IsJumping)
+            return base.CalculateProperties(deltaTime, pawn);
+        else
+            return CurrentProperties;
+    }
+
     protected override Acceleration CalculateAcceleration(double deltaTime, Pawn pawn)
     {
         if (LowJump)

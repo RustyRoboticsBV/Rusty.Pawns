@@ -53,10 +53,15 @@ public sealed partial class WalkAction : MovementActionX<WalkProperties>
         // Case 3: Initial speed.
         else if (CurrentSpeed == 0f && targetSpeed != 0f)
         {
-            if (CurrentProperties.AccelerationTime == 0)
+            if (CurrentProperties.AccelerationTime == 0f)
                 newSpeed = WalkFactor * CurrentProperties.TopSpeed;
-            else
+            else if (CurrentProperties.StartSpeed != 0f)
                 newSpeed = WalkFactor * CurrentProperties.StartSpeed;
+            else
+            {
+                Acceleration acceleration = Acceleration.FromUVT(CurrentProperties.StartSpeed, CurrentProperties.TopSpeed, CurrentProperties.AccelerationTime);
+                newSpeed = CurrentSpeed.Step(targetSpeed, (double)acceleration * deltaTime);
+            }
         }
 
         // Case 4: Accelerating.
@@ -79,7 +84,8 @@ public sealed partial class WalkAction : MovementActionX<WalkProperties>
         {
             newSpeed = 0f;
         }
+        GD.Print(newSpeed);
 
-        return targetSpeed;
+        return newSpeed;
     }
 }
