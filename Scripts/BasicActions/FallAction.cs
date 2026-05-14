@@ -14,7 +14,7 @@ public sealed partial class FallAction : MovementActionY<FallProperties>
     {
         if (Pawn.BelowAdjacent.IsGround)
             return 0f;
-        return -(GetDefaultGravity() * CurrentProperties.GravityMultiplier).Abs();
+        return GetGravityAcceleration(CurrentProperties.GravityMultiplier);
     }
 
     protected override Speed CalculateSpeed(double deltaTime, Pawn pawn)
@@ -22,14 +22,9 @@ public sealed partial class FallAction : MovementActionY<FallProperties>
         if (CurrentAcceleration == 0f)
             return 0f;
         Speed speed = base.CalculateSpeed(deltaTime, pawn);
-        Speed topSpeed = -new Speed(CurrentProperties.TopSpeed).Abs();
+        Speed topSpeed = GetFallSpeed(CurrentProperties.TopSpeed);
         if (speed < topSpeed)
             speed = topSpeed;
         return speed;
-    }
-
-    protected override Distance CalculateMovement(double deltaTime, Pawn pawn)
-    {
-        return base.CalculateMovement(deltaTime, pawn);
     }
 }

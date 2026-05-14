@@ -9,6 +9,6 @@ namespace Rusty.Pawns;
 public sealed partial class FallProperties : ActionProperties
 {
     /* Public properties. */
-    [Export] public float GravityMultiplier { get; set; } = 1f;
+    [Export] public float GravityMultiplier { get; set; } = 5f;
     [Export] public float TopSpeed { get; set; } = 30f;
 }

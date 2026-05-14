@@ -10,8 +10,29 @@ public partial class SimplePlayerController : Node3D
 
     /* Private methods. */
     private float MoveX { get; set; }
-    
+    private bool Jump { get; set; }
+
     /* Godot overrides. */
+    public override void _Input(InputEvent @event)
+    {
+        if (@event is InputEventKey key)
+        {
+            if (Input.IsKeyPressed(Key.Z))
+            {
+                if (!Jump)
+                    Pawn.GetComponent<JumpAction>().Jump();
+                Jump = true;
+            }
+            else
+            {
+                if (Jump)
+                    Pawn.GetComponent<JumpAction>().CancelJump();
+                Jump = false;
+            }
+
+        }
+    }
+
     public override void _Process(double delta)
     {
         MoveX = 0f;

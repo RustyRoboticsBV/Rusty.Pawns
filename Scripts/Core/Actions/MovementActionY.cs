@@ -96,9 +96,21 @@ public abstract partial class MovementActionY<T> : MovementAction
     }
 
     /* Protected methods. */
-    protected static Acceleration GetDefaultGravity()
+    /// <summary>
+    /// Get a gravity acceleration by multiplying a value with the default physics gravity from the project settings.
+    /// </summary>
+    protected static Acceleration GetGravityAcceleration(float multiplier)
     {
-        return (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
+        float defaultGravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
+        return -Mathf.Abs(defaultGravity * multiplier);
+    }
+
+    /// <summary>
+    /// Convert a value to a negative speed.
+    /// </summary>
+    protected static Speed GetFallSpeed(float speed)
+    {
+        return -Mathf.Abs(speed);
     }
 
     /// <summary>

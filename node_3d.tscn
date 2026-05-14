@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=26 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
@@ -8,9 +8,12 @@
 [ext_resource type="Script" uid="uid://cxkdxsl31ur4a" path="res://Scripts/Core/Group.cs" id="4_tereu"]
 [ext_resource type="Script" uid="uid://ch2pl3kf75oio" path="res://Scripts/BasicActions/FallAction.cs" id="6_6iypd"]
 [ext_resource type="Script" uid="uid://dxjwwdeqs80r4" path="res://AutoRotate.cs" id="6_i5arm"]
+[ext_resource type="Script" uid="uid://b4ucxfyypd30e" path="res://Scripts/BasicActions/JumpAction.cs" id="7_imku0"]
 [ext_resource type="Texture2D" uid="uid://dmybuwcpod8x1" path="res://Background.png" id="7_jsk3o"]
 [ext_resource type="Script" uid="uid://cgy2sky1blt5e" path="res://Scripts/BasicActions/FallProperties.cs" id="7_tereu"]
 [ext_resource type="Texture2D" uid="uid://775qgnk0id4a" path="res://Ground.png" id="8_4arys"]
+[ext_resource type="Script" uid="uid://d1l8xlmx3kw1v" path="res://Scripts/BasicActions/JumpProperties.cs" id="8_wlxy5"]
+[ext_resource type="Script" uid="uid://dieqd3nu81uba" path="res://Scripts/BasicActions/JumpFallModifier.cs" id="11_wlxy5"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6iypd"]
 
@@ -72,6 +75,14 @@ metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
 script = ExtResource("4_r3fl7")
 metadata/_custom_type_script = "uid://b04sx7q872ytp"
 
+[node name="JumpAction" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
+script = ExtResource("7_imku0")
+metadata/_custom_type_script = "uid://b4ucxfyypd30e"
+
+[node name="JumpProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/JumpAction"]
+script = ExtResource("8_wlxy5")
+metadata/_custom_type_script = "uid://d1l8xlmx3kw1v"
+
 [node name="Fall" type="Node3D" parent="SimplePlayerController/Pawn/Movement"]
 script = ExtResource("6_6iypd")
 metadata/_custom_type_script = "uid://ch2pl3kf75oio"
@@ -80,6 +91,16 @@ metadata/_custom_type_script = "uid://ch2pl3kf75oio"
 script = ExtResource("7_tereu")
 GravityMultiplier = 5.5
 metadata/_custom_type_script = "uid://cgy2sky1blt5e"
+
+[node name="Modifiers" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("4_tereu")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="JumpFallModifier" type="Node3D" parent="SimplePlayerController/Pawn/Modifiers" node_paths=PackedStringArray("Jump", "Fall")]
+script = ExtResource("11_wlxy5")
+Jump = NodePath("../../Movement/JumpAction")
+Fall = NodePath("../../Movement/Fall")
+metadata/_custom_type_script = "uid://dieqd3nu81uba"
 
 [node name="Camera3D" type="Camera3D" parent="SimplePlayerController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 11.897)

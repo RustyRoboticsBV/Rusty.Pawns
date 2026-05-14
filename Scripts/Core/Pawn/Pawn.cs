@@ -220,7 +220,7 @@ public sealed partial class Pawn : Node3D
             }
 
             // Update actions' speed.
-            for (int j = 0; j < actionCount; j++)
+            for (int j = 0; j < movementCount; j++)
             {
                 MovementAction movement = Components.GetAt<MovementAction>(j);
                 if (movement.IsActive(this))
@@ -236,7 +236,7 @@ public sealed partial class Pawn : Node3D
             }
 
             // Update movement actions' distance.
-            for (int j = 0; j < actionCount; j++)
+            for (int j = 0; j < movementCount; j++)
             {
                 MovementAction movement = Components.GetAt<MovementAction>(j);
                 if (movement.IsActive(this))
@@ -252,7 +252,7 @@ public sealed partial class Pawn : Node3D
             }
 
             // Update actions' face direction.
-            for (int j = 0; j < actionCount; j++)
+            for (int j = 0; j < movementCount; j++)
             {
                 MovementAction movement = Components.GetAt<MovementAction>(j);
                 if (movement.IsActive(this))
