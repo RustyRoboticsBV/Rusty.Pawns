@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://crmc46lhisf8f"
-path="res://.godot/imported/ActionProperties.svg-95be21c2bf666b40162fef061312f53a.ctex"
+uid="uid://ciuqjwm0xnbai"
+path="res://.godot/imported/PawnBehavior.svg-409278e213388dbb78d09e5ed94df7ca.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/Core/ActionProperties.svg"
-dest_files=["res://.godot/imported/ActionProperties.svg-95be21c2bf666b40162fef061312f53a.ctex"]
+source_file="res://Scripts/Core/Components/Behaviors/PawnBehavior.svg"
+dest_files=["res://.godot/imported/PawnBehavior.svg-409278e213388dbb78d09e5ed94df7ca.ctex"]
 
 [params]
 

@@ -206,6 +206,14 @@ public sealed partial class Pawn : Node3D
         // Update surroundings (in case objects in the environment moved).
         UpdateSurroundings();
 
+        // Invoke triggers.
+        for (int i = 0; i < Components.Count<Trigger>(); i++)
+        {
+            Trigger trigger = Components.GetAt<Trigger>(i);
+            trigger.TryInvoke(deltaTime);
+        }
+
+        // Run sub-step loops.
         int actionCount = Components.Count<Action>();
         int movementCount = Components.Count<MovementAction>();
         for (int i = 0; i < SubSteps; i++)

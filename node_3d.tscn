@@ -1,11 +1,11 @@
-[gd_scene load_steps=34 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=38 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
-[ext_resource type="Script" uid="uid://3qdjw51711mm" path="res://Scripts/Core/Raycasters/RaycastBox.cs" id="3_i5arm"]
+[ext_resource type="Script" uid="uid://3qdjw51711mm" path="res://Scripts/Core/Components/Behaviors/Raycasters/RaycastBox.cs" id="3_i5arm"]
 [ext_resource type="Script" uid="uid://c6d8wnkdq05kb" path="res://Scripts/BasicActions/Movement/WalkAction.cs" id="3_jka67"]
 [ext_resource type="Script" uid="uid://b04sx7q872ytp" path="res://Scripts/BasicActions/Movement/WalkProperties.cs" id="4_r3fl7"]
-[ext_resource type="Script" uid="uid://cxkdxsl31ur4a" path="res://Scripts/Core/Group.cs" id="4_tereu"]
+[ext_resource type="Script" uid="uid://cxkdxsl31ur4a" path="res://Scripts/Core/Components/Behaviors/Groups/Group.cs" id="4_tereu"]
 [ext_resource type="Script" uid="uid://ch2pl3kf75oio" path="res://Scripts/BasicActions/Movement/FallAction.cs" id="6_6iypd"]
 [ext_resource type="Script" uid="uid://b4ucxfyypd30e" path="res://Scripts/BasicActions/Movement/JumpAction.cs" id="7_imku0"]
 [ext_resource type="Texture2D" uid="uid://dmybuwcpod8x1" path="res://Background.png" id="7_jsk3o"]
@@ -19,9 +19,13 @@
 [ext_resource type="Script" uid="uid://cfs8syf4m0p71" path="res://Scripts/BasicActions/Conditions/Collision/IsAerialCondition.cs" id="13_3v7ru"]
 [ext_resource type="Script" uid="uid://dy24l112tlu5r" path="res://Scripts/BasicActions/Conditions/Collision/IsFacingWallCondition.cs" id="16_ealrb"]
 [ext_resource type="Script" uid="uid://b5kc1ygpwwjrw" path="res://Scripts/BasicActions/Conditions/State/ToggleCondition.cs" id="16_jsnrv"]
+[ext_resource type="Script" uid="uid://be35t76fr3i1r" path="res://Scripts/BasicActions/Conditions/Collision/IsBelowCeilingCondition.cs" id="17_vxd74"]
 [ext_resource type="Script" uid="uid://dxadkn3jxjhu0" path="res://Scripts/BasicActions/Conditions/Logical/AndCondition.cs" id="18_jsnrv"]
 [ext_resource type="Script" uid="uid://cy32h6ng2fkwq" path="res://Scripts/BasicActions/Conditions/Logical/NotCondition.cs" id="19_lggff"]
 [ext_resource type="Script" uid="uid://ckkc3d17vhov2" path="res://Scripts/BasicActions/Conditions/Movement/HasSpeedCondition.cs" id="20_s0gvp"]
+[ext_resource type="Script" uid="uid://cj5q0k716k3he" path="res://Scripts/BasicActions/Effects/JumpEffect.cs" id="23_5t8nk"]
+[ext_resource type="Script" uid="uid://bxbqjn1jsr2om" path="res://Scripts/BasicActions/Triggers/ManualTrigger.cs" id="24_dhlwf"]
+[ext_resource type="Script" uid="uid://b2fvsv1kq0eu7" path="res://Scripts/BasicActions/Effects/CancelJumpEffect.cs" id="24_j3e5s"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
 size = Vector3(1, 2, 1)
@@ -83,25 +87,27 @@ metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 
 [node name="Walk" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("3_jka67")
-Conditions = [NodePath("../../Conditions/IsNotGrabbingWall")]
+Conditions = [NodePath("../../Conditions/IsGrabbingWall/IsNotGrabbingWall")]
 metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
 
-[node name="GroundWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk"]
+[node name="GroundWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("4_r3fl7")
 AccelerationTime = 0.032
 DecelerationTime = 0.048
 TurnTime = 0.048
+Conditions = [NodePath("../../../Conditions/IsGrounded")]
 metadata/_custom_type_script = "uid://b04sx7q872ytp"
 
-[node name="AirWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk"]
+[node name="AirWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("4_r3fl7")
 AccelerationTime = 0.048
 DecelerationTime = 0.064
+Conditions = [NodePath("../../../Conditions/IsAerial")]
 metadata/_custom_type_script = "uid://b04sx7q872ytp"
 
 [node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("7_imku0")
-Conditions = [NodePath("../../Conditions/IsNotGrabbingWall")]
+Conditions = [NodePath("../../Conditions/IsGrabbingWall/IsNotGrabbingWall")]
 metadata/_custom_type_script = "uid://b4ucxfyypd30e"
 
 [node name="GroundJump" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Jump" node_paths=PackedStringArray("Conditions")]
@@ -122,8 +128,13 @@ metadata/_custom_type_script = "uid://d1l8xlmx3kw1v"
 
 [node name="Fall" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("6_6iypd")
-Conditions = [NodePath("../../Conditions/IsNotGrabbingWall")]
+Conditions = [NodePath("../../Conditions/IsGrabbingWall/IsNotGrabbingWall")]
 metadata/_custom_type_script = "uid://ch2pl3kf75oio"
+
+[node name="Fall" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Fall" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("7_tereu")
+Conditions = [NodePath("../../../Conditions/IsWallSliding/IsNotWallSliding")]
+metadata/_custom_type_script = "uid://cgy2sky1blt5e"
 
 [node name="WallSlide" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Fall" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("7_tereu")
@@ -132,16 +143,12 @@ TopSpeed = 5.0
 Conditions = [NodePath("../../../Conditions/IsWallSliding")]
 metadata/_custom_type_script = "uid://cgy2sky1blt5e"
 
-[node name="Fall" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Fall"]
-script = ExtResource("7_tereu")
-metadata/_custom_type_script = "uid://cgy2sky1blt5e"
-
-[node name="ClimbAction" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
+[node name="Climb" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("11_i0g27")
 Conditions = [NodePath("../../Conditions/IsGrabbingWall")]
 metadata/_custom_type_script = "uid://b42gml4r3m48x"
 
-[node name="ClimbProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/ClimbAction"]
+[node name="ClimbProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Climb"]
 script = ExtResource("12_ealrb")
 TopSpeed = 10.0
 AccelerationTime = 0.08
@@ -173,19 +180,13 @@ metadata/_custom_type_script = "uid://cfs8syf4m0p71"
 script = ExtResource("16_ealrb")
 metadata/_custom_type_script = "uid://dy24l112tlu5r"
 
+[node name="IsBelowCeiling" type="Node3D" parent="SimplePlayerController/Pawn/Conditions"]
+script = ExtResource("17_vxd74")
+metadata/_custom_type_script = "uid://be35t76fr3i1r"
+
 [node name="IsGrabbing" type="Node3D" parent="SimplePlayerController/Pawn/Conditions"]
 script = ExtResource("16_jsnrv")
 metadata/_custom_type_script = "uid://b5kc1ygpwwjrw"
-
-[node name="IsGrabbingWall" type="Node3D" parent="SimplePlayerController/Pawn/Conditions" node_paths=PackedStringArray("Condition")]
-script = ExtResource("18_jsnrv")
-Condition = [NodePath("../IsFacingWall"), NodePath("../IsGrabbing")]
-metadata/_custom_type_script = "uid://dxadkn3jxjhu0"
-
-[node name="IsNotGrabbingWall" type="Node3D" parent="SimplePlayerController/Pawn/Conditions" node_paths=PackedStringArray("Condition")]
-script = ExtResource("19_lggff")
-Condition = NodePath("../IsGrabbingWall")
-metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
 
 [node name="IsWalking" type="Node3D" parent="SimplePlayerController/Pawn/Conditions" node_paths=PackedStringArray("Movement")]
 script = ExtResource("20_s0gvp")
@@ -196,6 +197,44 @@ metadata/_custom_type_script = "uid://ckkc3d17vhov2"
 script = ExtResource("18_jsnrv")
 Condition = [NodePath("../IsFacingWall"), NodePath("../IsWalking")]
 metadata/_custom_type_script = "uid://dxadkn3jxjhu0"
+
+[node name="IsNotWallSliding" type="Node3D" parent="SimplePlayerController/Pawn/Conditions/IsWallSliding" node_paths=PackedStringArray("Condition")]
+script = ExtResource("19_lggff")
+Condition = NodePath("..")
+metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
+
+[node name="IsGrabbingWall" type="Node3D" parent="SimplePlayerController/Pawn/Conditions" node_paths=PackedStringArray("Condition")]
+script = ExtResource("18_jsnrv")
+Condition = [NodePath("../IsFacingWall"), NodePath("../IsGrabbing")]
+metadata/_custom_type_script = "uid://dxadkn3jxjhu0"
+
+[node name="IsNotGrabbingWall" type="Node3D" parent="SimplePlayerController/Pawn/Conditions/IsGrabbingWall" node_paths=PackedStringArray("Condition")]
+script = ExtResource("19_lggff")
+Condition = NodePath("..")
+metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
+
+[node name="Triggers" type="Node3D" parent="SimplePlayerController/Pawn"]
+script = ExtResource("4_tereu")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("24_dhlwf")
+metadata/_custom_type_script = "uid://bxbqjn1jsr2om"
+
+[node name="Effect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump" node_paths=PackedStringArray("Action")]
+script = ExtResource("23_5t8nk")
+Action = NodePath("../../../Movement/Jump")
+metadata/_custom_type_script = "uid://cj5q0k716k3he"
+
+[node name="CancelJump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers"]
+script = ExtResource("24_dhlwf")
+metadata/_custom_type_script = "uid://bxbqjn1jsr2om"
+
+[node name="Effect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/CancelJump" node_paths=PackedStringArray("Action")]
+script = ExtResource("24_j3e5s")
+Action = NodePath("../../../Movement/Jump")
+metadata/_custom_type_script = "uid://b2fvsv1kq0eu7"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)

@@ -32,7 +32,7 @@ public partial class SimplePlayerController : PawnDriver
             {
                 if (!Jump && JumpsLeft > 0)
                 {
-                    Pawn.GetComponent<JumpAction>().Jump();
+                    Pawn.GetComponent<ManualTrigger>("Jump").Activate();
                     JumpsLeft--;
                 }
                 Jump = true;
@@ -40,7 +40,7 @@ public partial class SimplePlayerController : PawnDriver
             else
             {
                 if (Jump)
-                    Pawn.GetComponent<JumpAction>().CancelJump();
+                    Pawn.GetComponent<ManualTrigger>("CancelJump").Activate();
                 Jump = false;
             }
 

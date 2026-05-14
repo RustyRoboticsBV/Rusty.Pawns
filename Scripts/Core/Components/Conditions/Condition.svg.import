@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://vr6xdxkgab68"
-path="res://.godot/imported/RaycastBox.svg-ba9196deb92fea31399731eb06a41d23.ctex"
+uid="uid://cvt2pr2lxp421"
+path="res://.godot/imported/Condition.svg-3aefd6afbceda831b4c45caf6674a4cf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/Core/Raycasters/RaycastBox.svg"
-dest_files=["res://.godot/imported/RaycastBox.svg-ba9196deb92fea31399731eb06a41d23.ctex"]
+source_file="res://Scripts/Core/Components/Conditions/Condition.svg"
+dest_files=["res://.godot/imported/Condition.svg-3aefd6afbceda831b4c45caf6674a4cf.ctex"]
 
 [params]
 

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="1_sbopx"]
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_vpolg"]
-[ext_resource type="Script" uid="uid://3qdjw51711mm" path="res://Scripts/Core/Raycasters/RaycastBox.cs" id="2_n2nbt"]
+[ext_resource type="Script" uid="uid://3qdjw51711mm" path="res://Scripts/Core/Components/Behaviors/Raycasters/RaycastBox.cs" id="2_n2nbt"]
 [ext_resource type="Script" uid="uid://c6d8wnkdq05kb" path="res://Scripts/BasicActions/Movement/WalkAction.cs" id="3_xn88x"]
 [ext_resource type="Script" uid="uid://b04sx7q872ytp" path="res://Scripts/BasicActions/Movement/WalkProperties.cs" id="4_x7m63"]
 
