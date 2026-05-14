@@ -5,7 +5,7 @@ namespace Rusty.Pawns;
 /// <summary>
 /// An effect that fires off other effects.
 /// </summary>
-[GlobalClass]
+[GlobalClass, Icon("./EffectGroup.svg")]
 public sealed partial class EffectGroup : Effect
 {
     /* Public methods. */

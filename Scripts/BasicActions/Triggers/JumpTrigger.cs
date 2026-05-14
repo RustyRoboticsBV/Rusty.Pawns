@@ -8,7 +8,7 @@ public partial class JumpTrigger : Trigger
     /* Public properties. */
     [Export] public int Jumps { get; set; } = 2;
     [Export] public float CoyoteTime { get; set; } = 0.083f;
-    [Export] public HasDistanceCondition IsJumpingCondition { get; set; }
+    [Export] public float BufferTime { get; set; } = 0.083f;
     [Export] public IsGroundedCondition IsGroundedCondition { get; set; }
     [Export] public Effect JumpEffect { get; set; }
     [Export] public Effect CancelJumpEffect { get; set; }
@@ -16,7 +16,7 @@ public partial class JumpTrigger : Trigger
     /* Private properties. */
     private int JumpsLeft { get; set; }
     private float CoyoteTimeLeft { get; set; }
-    private bool MustJump { get; set; }
+    private float BufferTimeLeft { get; set; }
     private bool MustCancel { get; set; }
 
     /* Public methods. */
@@ -25,7 +25,7 @@ public partial class JumpTrigger : Trigger
     /// </summary>
     public void TryJump()
     {
-        MustJump = true;
+        BufferTimeLeft = BufferTime;
     }
 
     /// <summary>
@@ -33,6 +33,7 @@ public partial class JumpTrigger : Trigger
     /// </summary>
     public void TryCancel()
     {
+        BufferTimeLeft = 0f;
         MustCancel = true;
     }
 
@@ -55,14 +56,15 @@ public partial class JumpTrigger : Trigger
         }
 
         // Jump.
-        if (MustJump)
+        if (BufferTimeLeft > 0f)
         {
             if (JumpsLeft > 0)
             {
                 JumpEffect.Invoke(deltaTime);
                 JumpsLeft--;
+                BufferTimeLeft = 0f;
             }
-            MustJump = false;
+            BufferTimeLeft -= (float)deltaTime;
         }
         if (MustCancel)
         {
