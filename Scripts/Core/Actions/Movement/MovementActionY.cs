@@ -4,7 +4,7 @@ using Rusty.Quantities;
 namespace Rusty.Pawns;
 
 /// <summary>
-/// An action that keeps track of horizontal speed and movement.
+/// A vertical movement action.
 /// </summary>
 public abstract partial class MovementActionY<T> : MovementAction
     where T : ActionProperties

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfel570n4b085"
-path="res://.godot/imported/JumpAction.svg-af94021d068bf7c879640e60b63bdeb8.ctex"
+uid="uid://cowc63o5nsgkc"
+path="res://.godot/imported/ModifierAction.svg-17c18ea387e6300070c0470acef3c4f2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/BasicActions/JumpAction.svg"
-dest_files=["res://.godot/imported/JumpAction.svg-af94021d068bf7c879640e60b63bdeb8.ctex"]
+source_file="res://Scripts/Core/Actions/Modifiers/ModifierAction.svg"
+dest_files=["res://.godot/imported/ModifierAction.svg-17c18ea387e6300070c0470acef3c4f2.ctex"]
 
 [params]
 

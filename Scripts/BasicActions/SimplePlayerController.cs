@@ -3,10 +3,9 @@ using Godot;
 namespace Rusty.Pawns.Examples;
 
 [GlobalClass]
-public partial class SimplePlayerController : Node3D
+public partial class SimplePlayerController : PawnDriver
 {
     /* Public properties. */
-	[Export] Pawn Pawn { get; set; }
     [Export] int Jumps { get; set; } = 2;
     [Export] float CoyoteTime { get; set; } = 0.0833f;
 
@@ -15,6 +14,8 @@ public partial class SimplePlayerController : Node3D
     private bool Jump { get; set; }
     private int JumpsLeft { get; set; }
     private float CoyoteTimeLeft { get; set; }
+    private bool Grabbing { get; set; }
+    private float MoveY { get; set; }
 
     /* Godot overrides. */
     public override void _EnterTree()
@@ -42,6 +43,23 @@ public partial class SimplePlayerController : Node3D
                     Pawn.GetComponent<JumpAction>().CancelJump();
                 Jump = false;
             }
+
+            if (Input.IsKeyPressed(Key.Ctrl))
+            {
+                if (!Grabbing)
+                {
+                    Pawn.GetComponent<ToggleCondition>("IsGrabbing").State = true;
+                    Grabbing = true;
+                }
+            }
+            else
+            {
+                if (Grabbing)
+                {
+                    Pawn.GetComponent<ToggleCondition>("IsGrabbing").State = false;
+                    Grabbing = false;
+                }
+            }
         }
     }
 
@@ -68,11 +86,20 @@ public partial class SimplePlayerController : Node3D
             MoveX -= 1f;
         if (Input.IsKeyPressed(Key.Right))
             MoveX += 1f;
+
+        MoveY = 0f;
+        if (Input.IsKeyPressed(Key.Down))
+            MoveY -= 1f;
+        if (Input.IsKeyPressed(Key.Up))
+            MoveY += 1f;
     }
 
     public override void _PhysicsProcess(double delta)
     {
         WalkAction walkAction = Pawn.GetComponent<WalkAction>();
         walkAction.Walk(MoveX);
+
+        ClimbAction climbAction = Pawn.GetComponent<ClimbAction>();
+        climbAction.Climb(MoveY);
     }
 }

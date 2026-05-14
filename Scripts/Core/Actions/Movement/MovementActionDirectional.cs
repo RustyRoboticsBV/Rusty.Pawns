@@ -4,7 +4,7 @@ using Rusty.Quantities;
 namespace Rusty.Pawns;
 
 /// <summary>
-/// Action that keeps track of both a 1D acceleration/speed/movement and a 2D direction vector.
+/// A directional movement action.
 /// </summary>
 public abstract partial class MovementActionDirectional<T> : MovementAction
     where T : ActionProperties

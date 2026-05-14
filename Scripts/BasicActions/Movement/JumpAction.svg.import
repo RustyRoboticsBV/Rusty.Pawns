@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://clspnq4b2dplo"
-path="res://.godot/imported/FallAction.svg-39e1f17ddd0e866ab2be2641859019d0.ctex"
+uid="uid://dfel570n4b085"
+path="res://.godot/imported/JumpAction.svg-dfc9a6f85e3b9dfb82605b7314573f94.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scripts/BasicActions/FallAction.svg"
-dest_files=["res://.godot/imported/FallAction.svg-39e1f17ddd0e866ab2be2641859019d0.ctex"]
+source_file="res://Scripts/BasicActions/Movement/JumpAction.svg"
+dest_files=["res://.godot/imported/JumpAction.svg-dfc9a6f85e3b9dfb82605b7314573f94.ctex"]
 
 [params]
 

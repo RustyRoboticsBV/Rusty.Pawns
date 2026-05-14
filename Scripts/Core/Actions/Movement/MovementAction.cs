@@ -10,6 +10,11 @@ public abstract partial class MovementAction : Action, IActionWithProperties
 {
     /* Public properties. */
     /// <summary>
+    /// Whether or not the pawn will call the ForceStop method if this movement action is disabled.
+    /// </summary>
+    [Export] public bool StopIfDisabled { get; set; } = true;
+
+    /// <summary>
     /// Whether or not this movement moves down sloped ground.
     /// </summary>
     public virtual bool DescendsSlopes => false;

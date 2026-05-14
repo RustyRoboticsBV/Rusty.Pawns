@@ -52,6 +52,11 @@ public sealed partial class Pawn : Node3D
     /// </summary>
     [Export, Range(0, 8)] public int SubSteps { get; set; } = 1;
 
+    /// <summary>
+    /// The pawn driver that owns this pawn.
+    /// </summary>
+    public PawnDriver Driver { get; set; }
+
     // Children.
     public ComponentCollection Components { get; private set; }
     public Raycaster ActiveRaycaster { get; private set; } // TODO: implement multiple raycasters.
@@ -302,6 +307,14 @@ public sealed partial class Pawn : Node3D
                     action.AfterUpdateFaceDirection(deltaTime, this);
             }
 
+            // Force-stop disabled movement actions.
+            for (int j = 0; j < movementCount; j++)
+            {
+                MovementAction movement = Components.GetAt<MovementAction>(j);
+                if (movement.StopIfDisabled && !movement.IsActive(this))
+                    movement.ForceStop();
+            }
+
             // Apply each action.
             for (int j = 0; j < movementCount; j++)
             {
@@ -422,10 +435,12 @@ public sealed partial class Pawn : Node3D
 
     private void DoMove(Vector3 movement)
     {
-        if (MovementTargetNode == null)
-            Translate(movement);
-        else
+        if (MovementTargetNode != null)
             MovementTargetNode.Translate(movement);
+        else if (Driver != null)
+            Driver.Translate(movement);
+        else
+            Translate(movement);
     }
 
 
