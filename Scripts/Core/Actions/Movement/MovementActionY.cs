@@ -80,7 +80,7 @@ public abstract partial class MovementActionY<T> : MovementAction
         return Up * CurrentSpeed;
     }
 
-    public sealed override Vector2 GetMovement()
+    public sealed override Vector2 GetDistance()
     {
         return Up * CurrentMovement;
     }

@@ -80,7 +80,7 @@ public abstract partial class MovementActionX<T> : MovementAction
         return Right * CurrentSpeed;
     }
 
-    public sealed override Vector2 GetMovement()
+    public sealed override Vector2 GetDistance()
     {
         return Right * CurrentMovement;
     }

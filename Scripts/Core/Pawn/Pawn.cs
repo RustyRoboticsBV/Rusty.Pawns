@@ -308,7 +308,7 @@ public sealed partial class Pawn : Node3D
                 MovementAction movement = Components.GetAt<MovementAction>(j);
                 if (movement.IsActive(this))
                 {
-                    DoMove(movement.GetMovement(), true, movement.DescendsSlopes);
+                    DoMove(movement.GetDistance(), true, movement.DescendsSlopes);
                     ApplyFacing(movement.GetFaceDirection());
                 }
             }

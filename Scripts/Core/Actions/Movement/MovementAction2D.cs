@@ -108,7 +108,7 @@ public abstract partial class MovementAction2D<T> : MovementAction
         return new Vector2(CurrentSpeedX, CurrentSpeedY);
     }
 
-    public sealed override Vector2 GetMovement()
+    public sealed override Vector2 GetDistance()
     {
         return new Vector2(CurrentMovementX, CurrentMovementY);
     }

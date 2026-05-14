@@ -85,7 +85,7 @@ public abstract partial class MovementActionDirectional<T> : MovementAction
         return CurrentSpeed * CurrentDirection;
     }
 
-    public sealed override Vector2 GetMovement()
+    public sealed override Vector2 GetDistance()
     {
         return CurrentMovement * CurrentDirection;
     }
@@ -138,7 +138,7 @@ public abstract partial class MovementActionDirectional<T> : MovementAction
     /// </summary>
     protected virtual FaceDirection CalculateFaceDirection(double deltaTime, Pawn pawn)
     {
-        Vector2 movement = GetMovement();
+        Vector2 movement = GetDistance();
 
         FaceDirectionX x = FaceDirectionX.NoChange;
         if (movement.X < 0f)

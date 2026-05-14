@@ -77,7 +77,7 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// <summary>
     /// Get the current movement as a Vector2.
     /// </summary>
-    public abstract Vector2 GetMovement();
+    public abstract Vector2 GetDistance();
 
     /// <summary>
     /// Get the current face direction in both directions.
@@ -104,7 +104,7 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// <summary>
     /// Get whether or not the action has a non-zero movement.
     /// </summary>
-    public virtual bool IsMoving() => GetMovement() != Vector2.Zero;
+    public virtual bool IsMoving() => GetDistance() != Vector2.Zero;
 
     /// <summary>
     /// Get whether or not the action is facing in a direction.
@@ -131,6 +131,6 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// </summary>
     protected void PrintState()
     {
-        GD.Print("Properties: " + GetProperties() + ", Acceleration: " + GetAcceleration() + ", Speed: " + GetSpeed() + ", Distance: " + GetMovement() + ", Facing: " + GetFaceDirection());
+        GD.Print("Properties: " + GetProperties() + ", Acceleration: " + GetAcceleration() + ", Speed: " + GetSpeed() + ", Distance: " + GetDistance() + ", Facing: " + GetFaceDirection());
     }
 }
