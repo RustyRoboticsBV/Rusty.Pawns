@@ -13,8 +13,8 @@ public class ComponentCollection
     public Pawn Pawn { get; private set; }
 
     /* Private properties. */
-    private Dictionary<Type, List<PawnComponent>> Children { get; set; }
-    private HashSet<PawnComponent> Registry { get; set; } = new HashSet<PawnComponent>();
+    private Dictionary<Type, List<PawnComponent>> Children { get; set; } = new();
+    private HashSet<PawnComponent> Registry { get; set; } = new();
 
     /* Constructors. */
     public ComponentCollection(Pawn pawn)
@@ -24,6 +24,15 @@ public class ComponentCollection
     }
 
     /* Public methods. */
+    /// <summary>
+    /// Rebuild the collection from the root node's current children.
+    /// </summary>
+    public void Rebuild()
+    {
+        Children.Clear();
+        Scan(Pawn);
+    }
+
     /// <summary>
     /// Register a component.
     /// </summary>
@@ -141,20 +150,19 @@ public class ComponentCollection
     /// </summary>
     private void Scan(Node root)
     {
-        // Do nothing if the child dictionary was already created.
-        if (Children != null)
-            return;
-        Children = new Dictionary<Type, List<PawnComponent>>();
-
         // Add lists for each type of component.
         for (int i = 0; i < root.GetChildCount(); i++)
         {
             Node node = root.GetChild(i);
             if (node is PawnComponent component)
+            {
+                GD.Print("- Adding: " + node.Name);
                 Add(component);
+            }
 
             if (node is not Pawn pawn)
                 Scan(node);
         }
     }
+
 }

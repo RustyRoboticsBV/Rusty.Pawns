@@ -137,13 +137,10 @@ public sealed partial class Pawn : Node3D
         Components = new ComponentCollection(this);
 
         // Call initialize methods.
-        for (int i = 0; i < GetChildCount(); i++)
+        for (int i = 0; i < Components.Count<PawnComponent>(); i++)
         {
-            Node node = GetChild(i);
-            if (node is PawnComponent child)
-            {
-                child.Init(this);
-            }
+            Components.GetAt<PawnComponent>(i).Init(this);
+            GD.Print("! Initializing: " + Components.GetAt<PawnComponent>(i).Name);
         }
     }
 
