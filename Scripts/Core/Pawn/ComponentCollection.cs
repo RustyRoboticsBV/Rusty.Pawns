@@ -127,6 +127,24 @@ public class ComponentCollection
     }
 
     /// <summary>
+    /// Get a component of some type (including derived types).
+    /// </summary>
+    public T GetNamed<T>(string name)
+        where T : PawnComponent
+    {
+        if (Children.TryGetValue(typeof(T), out var list))
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].GetSearchName() == name)
+                    return list[i] as T;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Get the first active component of some type (including derived types).
     /// </summary>
     public T GetFirstActive<T>()

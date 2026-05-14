@@ -42,8 +42,8 @@ Several categories of components exist:
 - Raycasters: Perform collision detection.
 - Triggers: Detect events or state changes and fire effects in response.
 - Effects: Execute behavior in response to triggers.
-- Conditions: Boolean checks that determine whether other components are active.
 - Groups: Can be used to enable/disable collections of components.
+- Conditions: Boolean checks that determine whether other components are active.
 
 ## Documentation
 For a more detailed explanation of the framework, its concepts, and its classes - including getting started guides - visit the [documentation pages](https://github.com/RustyRoboticsBV/Rusty.Pawns/wiki).

@@ -61,7 +61,7 @@ public abstract partial class PawnComponent : Node3D
     public string GetSearchName()
     {
         if (string.IsNullOrEmpty(Alias))
-            return GetPawnComponentPath();
+            return Name;
         return Alias;
     }
 

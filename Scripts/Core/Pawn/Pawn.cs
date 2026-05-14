@@ -109,6 +109,15 @@ public sealed partial class Pawn : Node3D
     }
 
     /// <summary>
+    /// Get a pawn component of some type.
+    /// </summary>
+    public T GetComponent<T>(string name)
+        where T : PawnComponent
+    {
+        return Components.GetNamed<T>(name);
+    }
+
+    /// <summary>
     /// Add a component to the pawn.
     /// </summary>
     public T AddComponent<T>(string alias = "")
@@ -119,6 +128,32 @@ public sealed partial class Pawn : Node3D
         AddChild(component);
         Components.Add(component);
         return component;
+    }
+
+    /// <summary>
+    /// Check if a condition evaluates to true.
+    /// </summary>
+    public bool CheckCondition<T>()
+        where T : Condition
+    {
+        return GetComponent<T>()?.Evaluate(this) ?? false;
+    }
+
+    /// <summary>
+    /// Check if a condition evaluates to true.
+    /// </summary>
+    public bool CheckCondition<T>(string name)
+        where T : Condition
+    {
+        return GetComponent<T>(name)?.Evaluate(this) ?? false;
+    }
+
+    /// <summary>
+    /// Check if a condition evaluates to true.
+    /// </summary>
+    public bool CheckCondition(string name)
+    {
+        return GetComponent<Condition>(name)?.Evaluate(this) ?? false;
     }
 
     /* Godot overrides. */

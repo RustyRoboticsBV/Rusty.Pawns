@@ -84,7 +84,6 @@ public sealed partial class WalkAction : MovementActionX<WalkProperties>
         {
             newSpeed = 0f;
         }
-        GD.Print(newSpeed);
 
         return newSpeed;
     }
