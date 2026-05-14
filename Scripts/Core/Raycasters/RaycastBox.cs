@@ -11,7 +11,7 @@ public sealed partial class RaycastBox : Raycaster
     /* Public properties. */
     [Export] public override Vector2 Size { get; set; } = Vector2.One;
     [Export] public override float SkinWidth { get; set; } = 0.01f;
-    [Export] public Vector2I RayNumber { get; set; } = Vector2I.One * 3;
+    [Export] public Vector2I RayNumber { get; set; } = new Vector2I(3, 3);
     [Export(PropertyHint.Layers3DPhysics)] public uint LayerMask { get; set; } = 1;
 
     public Vector3 TopLeft => new(-Size.X / 2f, Size.Y / 2f, 0f);

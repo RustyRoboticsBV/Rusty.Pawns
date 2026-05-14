@@ -30,6 +30,7 @@ public sealed partial class WalkAction : MovementActionX<WalkProperties>
         WalkFactor = 0f;
     }
 
+    /* Protected methods. */
     protected override Speed CalculateSpeed(double deltaTime, Pawn pawn)
     {
         // Get current and target speed.

@@ -52,6 +52,11 @@ public abstract partial class MovementAction : Action, IActionWithProperties
     /// </summary>
     public abstract void UpdateFaceDirection(double deltaTime, Pawn pawn);
 
+    /// <summary>
+    /// Finish up the update loop.
+    /// </summary>
+    public virtual void PostProcess(double deltaTime, Pawn pawn) { }
+
     // Getter methods.
 
     /// <summary>

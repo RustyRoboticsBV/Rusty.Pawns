@@ -29,10 +29,10 @@ Driver
 
 Several types of components exist:
 - Actions:
-  - Movements: Implement movement behavior such as walking, jumping, flying or dashing. Each action manages its own movement state.
-  - Modifiers: Modify the state of movement actions, modelling interactions between different movement actions.
-- Action Properties: Provide configurable values for actions, such as speed, acceleration or timing settings.
-- Raycasters: Perform collision and surface detection.
+  - Movements: Implement movement behavior such as walking, jumping, flying or dashing. Each action manages its own movement state. The pawn composits them into one movement vector each loop.
+  - Modifiers: Modify the state of movement actions. Can be used to alter a single movement, or to model interactions between several movements.
+- Properties: Provide configurable values for actions, such as speed, acceleration or timing settings.
+- Raycasters: Perform collision detection.
 - Triggers: Detect events or state changes and fire effects in response.
 - Effects: Execute behavior in response to triggers.
 - Conditions: Boolean checks that determine whether other components are active.

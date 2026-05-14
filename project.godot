@@ -14,6 +14,16 @@ config/name="Pawns"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/mode=4
+window/vsync/vsync_mode=3
+
 [dotnet]
 
 project/assembly_name="Pawns"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

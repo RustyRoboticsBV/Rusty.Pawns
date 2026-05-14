@@ -1,4 +1,5 @@
 using Godot;
+using System.ComponentModel.DataAnnotations;
 
 namespace Rusty.Pawns;
 
@@ -43,9 +44,13 @@ public sealed partial class Pawn : Node3D
     /// </summary>
     [Export] public float AdjacencyCheckDistance { get; set; } = 0.01f;
     /// <summary>
+    /// The update method that should be used for this pawn.
+    /// </summary>
+    [Export] public UpdateType ProcessType { get; set; } = UpdateType.PhysicsProcess;
+    /// <summary>
     /// Divides the physics loop into multiple steps. Increases precision, but lowers performance.
     /// </summary>
-    [Export] public int SubSteps { get; set; } = 1;
+    [Export, Range(0, 8)] public int SubSteps { get; set; } = 1;
 
     // Children.
     public ComponentCollection Components { get; private set; }
@@ -79,6 +84,9 @@ public sealed partial class Pawn : Node3D
     public AdjacentSurface AboveAdjacent => Above.IsAdjacent ? Above.Surface : AdjacentSurface.Nothing;
     public AdjacentSurface FrontAdjacent => IsFacingRight ? ToRightAdjacent : ToLeftAdjacent;
     public AdjacentSurface BehindAdjacent => IsFacingRight ? ToLeftAdjacent : ToRightAdjacent;
+
+    /* Public types. */
+    public enum UpdateType { Process, PhysicsProcess };
 
     /* Public methods. */
     /// <summary>
@@ -139,7 +147,20 @@ public sealed partial class Pawn : Node3D
         }
     }
 
+    public override void _Process(double deltaTime)
+    {
+        if (ProcessType == UpdateType.Process)
+            Update(deltaTime);
+    }
+
     public override void _PhysicsProcess(double deltaTime)
+    {
+        if (ProcessType == UpdateType.PhysicsProcess)
+            Update(deltaTime);
+    }
+
+    /* Private methods. */
+    private void Update(double deltaTime)
     {
         double subDeltaTime = deltaTime / SubSteps;
 
@@ -263,7 +284,6 @@ public sealed partial class Pawn : Node3D
         }
     }
 
-    /* Private methods. */
     private void DoMove(Vector2 movement, bool climbSlopes, bool descendSlopes)
     {
         if (movement.X != 0f)

@@ -8,16 +8,22 @@ public partial class SimplePlayerController : Node3D
     /* Public properties. */
 	[Export] Pawn Pawn { get; set; }
 
+    /* Private methods. */
+    private float MoveX { get; set; }
+    
     /* Godot overrides. */
     public override void _Process(double delta)
     {
-        float moveX = 0f;
+        MoveX = 0f;
         if (Input.IsKeyPressed(Key.Left))
-            moveX -= 1f;
+            MoveX -= 1f;
         if (Input.IsKeyPressed(Key.Right))
-            moveX += 1f;
+            MoveX += 1f;
+    }
 
+    public override void _PhysicsProcess(double delta)
+    {
         WalkAction walkAction = Pawn.GetComponent<WalkAction>();
-        walkAction.Walk(moveX);
+        walkAction.Walk(MoveX);
     }
 }
