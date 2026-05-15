@@ -1,0 +1,316 @@
+[gd_scene load_steps=34 format=3 uid="uid://blhq3hfoyhxw7"]
+
+[ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="1_g1ne3"]
+[ext_resource type="Script" uid="uid://cxkdxsl31ur4a" path="res://Scripts/Core/Components/Behaviors/Groups/Group.cs" id="2_tstk8"]
+[ext_resource type="Script" uid="uid://3qdjw51711mm" path="res://Scripts/Core/Components/Behaviors/Raycasters/RaycastBox.cs" id="3_hhi12"]
+[ext_resource type="Script" uid="uid://c6d8wnkdq05kb" path="res://Scripts/BasicActions/Movement/WalkAction.cs" id="4_idoyd"]
+[ext_resource type="Script" uid="uid://b04sx7q872ytp" path="res://Scripts/BasicActions/Movement/WalkProperties.cs" id="5_b3r7a"]
+[ext_resource type="Script" uid="uid://b4ucxfyypd30e" path="res://Scripts/BasicActions/Movement/JumpAction.cs" id="6_gjrs8"]
+[ext_resource type="Script" uid="uid://d1l8xlmx3kw1v" path="res://Scripts/BasicActions/Movement/JumpProperties.cs" id="7_13xui"]
+[ext_resource type="Script" uid="uid://ch2pl3kf75oio" path="res://Scripts/BasicActions/Movement/FallAction.cs" id="8_3n20f"]
+[ext_resource type="Script" uid="uid://cgy2sky1blt5e" path="res://Scripts/BasicActions/Movement/FallProperties.cs" id="9_mhnuq"]
+[ext_resource type="Script" uid="uid://cq0gd4u1xne5a" path="res://Scripts/BasicActions/Movement/GrabAction.cs" id="10_uelh2"]
+[ext_resource type="Script" uid="uid://u87cgnbicg4k" path="res://Scripts/BasicActions/Movement/GrabProperties.cs" id="11_y02nj"]
+[ext_resource type="Script" uid="uid://b42gml4r3m48x" path="res://Scripts/BasicActions/Movement/ClimbAction.cs" id="12_7goey"]
+[ext_resource type="Script" uid="uid://cbjuhd3tqokv3" path="res://Scripts/BasicActions/Movement/ClimbProperties.cs" id="13_o307m"]
+[ext_resource type="Script" uid="uid://b3pd4x8h31irp" path="res://Scripts/BasicActions/Modifiers/JumpFallModifier.cs" id="14_x4vu7"]
+[ext_resource type="Script" uid="uid://dfjhlexbddlr0" path="res://Scripts/BasicActions/Modifiers/WalkGrabModifier.cs" id="15_lcm75"]
+[ext_resource type="Script" uid="uid://er7d8wjhjya1" path="res://Scripts/BasicActions/Conditions/Collision/IsGroundedCondition.cs" id="16_nyrk5"]
+[ext_resource type="Script" uid="uid://cfs8syf4m0p71" path="res://Scripts/BasicActions/Conditions/Collision/IsAerialCondition.cs" id="17_wwjts"]
+[ext_resource type="Script" uid="uid://dy24l112tlu5r" path="res://Scripts/BasicActions/Conditions/Collision/IsFacingWallCondition.cs" id="18_t6hoh"]
+[ext_resource type="Script" uid="uid://be35t76fr3i1r" path="res://Scripts/BasicActions/Conditions/Collision/IsBelowCeilingCondition.cs" id="19_s7gdo"]
+[ext_resource type="Script" uid="uid://b7tkg4vcojs2h" path="res://Scripts/BasicActions/Conditions/Collision/DistanceToWallCondition.cs" id="20_m80y3"]
+[ext_resource type="Script" uid="uid://b5kc1ygpwwjrw" path="res://Scripts/BasicActions/Conditions/State/ToggleCondition.cs" id="21_u5wuu"]
+[ext_resource type="Script" uid="uid://cy32h6ng2fkwq" path="res://Scripts/BasicActions/Conditions/Logical/NotCondition.cs" id="22_ld5jj"]
+[ext_resource type="Script" uid="uid://ckkc3d17vhov2" path="res://Scripts/BasicActions/Conditions/Movement/HasSpeedCondition.cs" id="23_qsbq0"]
+[ext_resource type="Script" uid="uid://dxadkn3jxjhu0" path="res://Scripts/BasicActions/Conditions/Logical/AndCondition.cs" id="24_yno80"]
+[ext_resource type="Script" uid="uid://um220quwve4g" path="res://Scripts/BasicActions/Triggers/JumpTrigger.cs" id="25_508iv"]
+[ext_resource type="Script" uid="uid://c6ax1orl88l5" path="res://Scripts/BasicActions/Effects/EffectGroup.cs" id="26_qqj7x"]
+[ext_resource type="Script" uid="uid://cj5q0k716k3he" path="res://Scripts/BasicActions/Effects/JumpEffect.cs" id="27_8tjwo"]
+[ext_resource type="Script" uid="uid://ffydawkn30v2" path="res://Scripts/BasicActions/Effects/CancelJumpEffect.cs" id="28_vs76e"]
+[ext_resource type="Script" uid="uid://8q0xn247pvp1" path="res://Scripts/BasicActions/Triggers/GrabTrigger.cs" id="29_tif1p"]
+[ext_resource type="Script" uid="uid://cjkg33ak3pmk8" path="res://Scripts/BasicActions/Effects/GrabEffect.cs" id="30_gwa2v"]
+[ext_resource type="Script" uid="uid://dsltatofiap1o" path="res://Scripts/BasicActions/Effects/ToggleEffect.cs" id="31_w24vt"]
+[ext_resource type="Script" uid="uid://bwk5acjtge1wg" path="res://Scripts/BasicActions/Effects/GrabReleaseEffect.cs" id="32_lwtht"]
+[ext_resource type="Script" uid="uid://dol20xlps5joy" path="res://Scripts/BasicActions/Triggers/SprintTrigger.cs" id="33_jqchj"]
+
+[node name="Pawn" type="Node3D"]
+script = ExtResource("1_g1ne3")
+metadata/_custom_type_script = "uid://kl8e2pf3srga"
+
+[node name="Raycasters" type="Node3D" parent="."]
+script = ExtResource("2_tstk8")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="Standing" type="Node3D" parent="Raycasters"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+script = ExtResource("3_hhi12")
+Size = Vector2(1, 2)
+metadata/_custom_type_script = "uid://3qdjw51711mm"
+
+[node name="Movement" type="Node3D" parent="."]
+script = ExtResource("2_tstk8")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="Walk" type="Node3D" parent="Movement" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("4_idoyd")
+Conditions = [NodePath("../../Conditions/IsGrabbingWall/IsNotGrabbingWall")]
+metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
+
+[node name="GroundWalk" type="Node3D" parent="Movement/Walk" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("5_b3r7a")
+TopSpeed = 15.0
+AccelerationTime = 0.032
+DecelerationTime = 0.048
+TurnTime = 0.048
+Conditions = [NodePath("../../../Conditions/IsGrounded"), NodePath("../../../Conditions/IsSprinting/IsNotSprinting")]
+metadata/_custom_type_script = "uid://b04sx7q872ytp"
+
+[node name="AirWalk" type="Node3D" parent="Movement/Walk" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("5_b3r7a")
+TopSpeed = 14.5
+AccelerationTime = 0.048
+DecelerationTime = 0.064
+Conditions = [NodePath("../../../Conditions/IsAerial"), NodePath("../../../Conditions/IsSprinting/IsNotSprinting")]
+metadata/_custom_type_script = "uid://b04sx7q872ytp"
+
+[node name="GroundSprint" type="Node3D" parent="Movement/Walk" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("5_b3r7a")
+StartSpeed = 10.0
+TopSpeed = 23.0
+AccelerationTime = 0.032
+DecelerationTime = 0.1
+TurnTime = 0.2
+Conditions = [NodePath("../../../Conditions/IsGrounded"), NodePath("../../../Conditions/IsSprinting")]
+metadata/_custom_type_script = "uid://b04sx7q872ytp"
+
+[node name="AirSprint" type="Node3D" parent="Movement/Walk" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("5_b3r7a")
+StartSpeed = 10.0
+TopSpeed = 22.0
+AccelerationTime = 0.048
+DecelerationTime = 0.1
+Conditions = [NodePath("../../../Conditions/IsAerial"), NodePath("../../../Conditions/IsSprinting")]
+metadata/_custom_type_script = "uid://b04sx7q872ytp"
+
+[node name="Jump" type="Node3D" parent="Movement" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("6_gjrs8")
+Conditions = [NodePath("../../Conditions/IsGrabbingWall/IsNotGrabbingWall")]
+metadata/_custom_type_script = "uid://b4ucxfyypd30e"
+
+[node name="GroundJump" type="Node3D" parent="Movement/Jump" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("7_13xui")
+Height = 5.5
+GravityMultiplier = 10.0
+CancelledGravityMultiplier = 40.0
+Conditions = [NodePath("../../../Conditions/IsGrounded")]
+metadata/_custom_type_script = "uid://d1l8xlmx3kw1v"
+
+[node name="AirJump" type="Node3D" parent="Movement/Jump" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("7_13xui")
+Height = 4.5
+GravityMultiplier = 11.0
+CancelledGravityMultiplier = 22.0
+Conditions = [NodePath("../../../Conditions/IsAerial")]
+metadata/_custom_type_script = "uid://d1l8xlmx3kw1v"
+
+[node name="Fall" type="Node3D" parent="Movement" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("8_3n20f")
+Conditions = [NodePath("../../Conditions/IsGrabbingWall/IsNotGrabbingWall")]
+metadata/_custom_type_script = "uid://ch2pl3kf75oio"
+
+[node name="Fall" type="Node3D" parent="Movement/Fall" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("9_mhnuq")
+Conditions = [NodePath("../../../Conditions/IsWallSliding/IsNotWallSliding")]
+metadata/_custom_type_script = "uid://cgy2sky1blt5e"
+
+[node name="WallSlide" type="Node3D" parent="Movement/Fall" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("9_mhnuq")
+GravityMultiplier = 1.0
+TopSpeed = 5.0
+Conditions = [NodePath("../../../Conditions/IsWallSliding")]
+metadata/_custom_type_script = "uid://cgy2sky1blt5e"
+
+[node name="Grab" type="Node3D" parent="Movement"]
+script = ExtResource("10_uelh2")
+metadata/_custom_type_script = "uid://cq0gd4u1xne5a"
+
+[node name="Properties" type="Node3D" parent="Movement/Grab"]
+script = ExtResource("11_y02nj")
+metadata/_custom_type_script = "uid://u87cgnbicg4k"
+
+[node name="Climb" type="Node3D" parent="Movement" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("12_7goey")
+Conditions = [NodePath("../../Conditions/IsGrabbingWall"), NodePath("../../Conditions/IsFacingWall")]
+metadata/_custom_type_script = "uid://b42gml4r3m48x"
+
+[node name="ClimbProperties" type="Node3D" parent="Movement/Climb"]
+script = ExtResource("13_o307m")
+TopSpeed = 10.0
+AccelerationTime = 0.08
+DecelerationTime = 0.032
+metadata/_custom_type_script = "uid://cbjuhd3tqokv3"
+
+[node name="Modifiers" type="Node3D" parent="."]
+script = ExtResource("2_tstk8")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="JumpFall" type="Node3D" parent="Modifiers" node_paths=PackedStringArray("Jump", "Fall")]
+script = ExtResource("14_x4vu7")
+Jump = NodePath("../../Movement/Jump")
+Fall = NodePath("../../Movement/Fall")
+
+[node name="GrabWalkModifier" type="Node3D" parent="Modifiers" node_paths=PackedStringArray("Walk", "Grab")]
+script = ExtResource("15_lcm75")
+Walk = NodePath("../../Movement/Walk")
+Grab = NodePath("../../Movement/Grab")
+metadata/_custom_type_script = "uid://dfjhlexbddlr0"
+
+[node name="Conditions" type="Node3D" parent="."]
+script = ExtResource("2_tstk8")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="IsGrounded" type="Node3D" parent="Conditions"]
+script = ExtResource("16_nyrk5")
+metadata/_custom_type_script = "uid://er7d8wjhjya1"
+
+[node name="IsAerial" type="Node3D" parent="Conditions"]
+script = ExtResource("17_wwjts")
+metadata/_custom_type_script = "uid://cfs8syf4m0p71"
+
+[node name="IsFacingWall" type="Node3D" parent="Conditions"]
+script = ExtResource("18_t6hoh")
+metadata/_custom_type_script = "uid://dy24l112tlu5r"
+
+[node name="IsBelowCeiling" type="Node3D" parent="Conditions"]
+script = ExtResource("19_s7gdo")
+metadata/_custom_type_script = "uid://be35t76fr3i1r"
+
+[node name="InGrabWallRange" type="Node3D" parent="Conditions"]
+script = ExtResource("20_m80y3")
+metadata/_custom_type_script = "uid://b7tkg4vcojs2h"
+
+[node name="IsGrabbing" type="Node3D" parent="Conditions"]
+script = ExtResource("21_u5wuu")
+metadata/_custom_type_script = "uid://b5kc1ygpwwjrw"
+
+[node name="IsSprinting" type="Node3D" parent="Conditions"]
+script = ExtResource("21_u5wuu")
+metadata/_custom_type_script = "uid://b5kc1ygpwwjrw"
+
+[node name="IsNotSprinting" type="Node3D" parent="Conditions/IsSprinting" node_paths=PackedStringArray("Condition")]
+script = ExtResource("22_ld5jj")
+Condition = NodePath("..")
+metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
+
+[node name="IsWalking" type="Node3D" parent="Conditions" node_paths=PackedStringArray("Movement")]
+script = ExtResource("23_qsbq0")
+Movement = NodePath("../../Movement/Walk")
+metadata/_custom_type_script = "uid://ckkc3d17vhov2"
+
+[node name="IsWallSliding" type="Node3D" parent="Conditions" node_paths=PackedStringArray("Condition")]
+script = ExtResource("24_yno80")
+Condition = [NodePath("../IsFacingWall"), NodePath("../IsWalking")]
+metadata/_custom_type_script = "uid://dxadkn3jxjhu0"
+
+[node name="IsNotWallSliding" type="Node3D" parent="Conditions/IsWallSliding" node_paths=PackedStringArray("Condition")]
+script = ExtResource("22_ld5jj")
+Condition = NodePath("..")
+metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
+
+[node name="IsGrabbingWall" type="Node3D" parent="Conditions" node_paths=PackedStringArray("Condition")]
+script = ExtResource("24_yno80")
+Condition = [NodePath("../IsFacingWall"), NodePath("../IsGrabbing")]
+metadata/_custom_type_script = "uid://dxadkn3jxjhu0"
+
+[node name="IsNotGrabbingWall" type="Node3D" parent="Conditions/IsGrabbingWall" node_paths=PackedStringArray("Condition")]
+script = ExtResource("22_ld5jj")
+Condition = NodePath("..")
+metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
+
+[node name="Triggers" type="Node3D" parent="."]
+script = ExtResource("2_tstk8")
+metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
+
+[node name="Jump" type="Node3D" parent="Triggers" node_paths=PackedStringArray("IsGroundedCondition", "CancelEffect", "InvokeEffect")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("25_508iv")
+CoyoteTime = 0.1
+IsGroundedCondition = NodePath("../../Conditions/IsGrounded")
+CancelEffect = NodePath("Cancel")
+InvokeEffect = NodePath("Invoke")
+metadata/_custom_type_script = "uid://um220quwve4g"
+
+[node name="Invoke" type="Node3D" parent="Triggers/Jump"]
+script = ExtResource("26_qqj7x")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
+
+[node name="Jump" type="Node3D" parent="Triggers/Jump/Invoke" node_paths=PackedStringArray("Action")]
+script = ExtResource("27_8tjwo")
+Action = NodePath("../../../../Movement/Jump")
+metadata/_custom_type_script = "uid://cj5q0k716k3he"
+
+[node name="Cancel" type="Node3D" parent="Triggers/Jump"]
+script = ExtResource("26_qqj7x")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
+
+[node name="CancelJump" type="Node3D" parent="Triggers/Jump/Cancel" node_paths=PackedStringArray("Action")]
+script = ExtResource("28_vs76e")
+Action = NodePath("../../../../Movement/Jump")
+metadata/_custom_type_script = "uid://ffydawkn30v2"
+
+[node name="Grab" type="Node3D" parent="Triggers" node_paths=PackedStringArray("CancelEffect", "InvokeEffect")]
+script = ExtResource("29_tif1p")
+GrabDistance = 1.0
+CancelEffect = NodePath("Cancel")
+InvokeEffect = NodePath("Invoke")
+metadata/_custom_type_script = "uid://8q0xn247pvp1"
+
+[node name="Invoke" type="Node3D" parent="Triggers/Grab"]
+script = ExtResource("26_qqj7x")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
+
+[node name="Grab" type="Node3D" parent="Triggers/Grab/Invoke" node_paths=PackedStringArray("Action")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("30_gwa2v")
+Action = NodePath("../../../../Movement/Grab")
+metadata/_custom_type_script = "uid://cjkg33ak3pmk8"
+
+[node name="Toggle" type="Node3D" parent="Triggers/Grab/Invoke" node_paths=PackedStringArray("Toggle")]
+script = ExtResource("31_w24vt")
+Toggle = NodePath("../../../../Conditions/IsGrabbing")
+Value = true
+metadata/_custom_type_script = "uid://dsltatofiap1o"
+
+[node name="Cancel" type="Node3D" parent="Triggers/Grab"]
+script = ExtResource("26_qqj7x")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
+
+[node name="GrabReleas" type="Node3D" parent="Triggers/Grab/Cancel" node_paths=PackedStringArray("Action")]
+script = ExtResource("32_lwtht")
+Action = NodePath("../../../../Movement/Grab")
+metadata/_custom_type_script = "uid://bwk5acjtge1wg"
+
+[node name="Toggle" type="Node3D" parent="Triggers/Grab/Cancel" node_paths=PackedStringArray("Toggle")]
+script = ExtResource("31_w24vt")
+Toggle = NodePath("../../../../Conditions/IsGrabbing")
+metadata/_custom_type_script = "uid://dsltatofiap1o"
+
+[node name="Sprint" type="Node3D" parent="Triggers" node_paths=PackedStringArray("CancelEffect", "InvokeEffect")]
+script = ExtResource("33_jqchj")
+CancelEffect = NodePath("Cancel")
+InvokeEffect = NodePath("Invoke")
+metadata/_custom_type_script = "uid://dol20xlps5joy"
+
+[node name="Invoke" type="Node3D" parent="Triggers/Sprint" node_paths=PackedStringArray("Toggle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("31_w24vt")
+Toggle = NodePath("../../../Conditions/IsSprinting")
+Value = true
+metadata/_custom_type_script = "uid://dsltatofiap1o"
+
+[node name="Cancel" type="Node3D" parent="Triggers/Sprint" node_paths=PackedStringArray("Toggle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("31_w24vt")
+Toggle = NodePath("../../../Conditions/IsSprinting")
+metadata/_custom_type_script = "uid://dsltatofiap1o"

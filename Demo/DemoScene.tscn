@@ -1,0 +1,90 @@
+[gd_scene load_steps=15 format=3 uid="uid://dyprs8yt6tlxj"]
+
+[ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_38irp"]
+[ext_resource type="PackedScene" uid="uid://blhq3hfoyhxw7" path="res://Demo/DefaultPawn.tscn" id="2_fj30v"]
+[ext_resource type="Texture2D" uid="uid://dmybuwcpod8x1" path="res://Demo/Background.png" id="3_e2ney"]
+[ext_resource type="Texture2D" uid="uid://775qgnk0id4a" path="res://Demo/Ground.png" id="4_ffa0c"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
+size = Vector3(1, 2, 1)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6iypd"]
+
+[sub_resource type="Sky" id="Sky_tereu"]
+sky_material = SubResource("ProceduralSkyMaterial_6iypd")
+
+[sub_resource type="Environment" id="Environment_cdqbm"]
+background_mode = 2
+sky = SubResource("Sky_tereu")
+ambient_light_source = 3
+
+[sub_resource type="QuadMesh" id="QuadMesh_imku0"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wlxy5"]
+albedo_texture = ExtResource("3_e2ney")
+uv1_scale = Vector3(100, 100, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_3v7ru"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tcnuu"]
+albedo_texture = ExtResource("4_ffa0c")
+uv1_scale = Vector3(100, 10, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jsk3o"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4arys"]
+albedo_texture = ExtResource("4_ffa0c")
+uv1_scale = Vector3(5, 5, 5)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="SimplePlayerController" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1788688, 0)
+script = ExtResource("1_38irp")
+metadata/_custom_type_script = "uid://qln580dj5gv5"
+
+[node name="Pawn" parent="SimplePlayerController" instance=ExtResource("2_fj30v")]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("BoxMesh_i5arm")
+skeleton = NodePath("../Pawn")
+
+[node name="Camera3D" type="Camera3D" parent="SimplePlayerController"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 11.897)
+environment = SubResource("Environment_cdqbm")
+
+[node name="Level" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Level"]
+transform = Transform3D(0.095317185, 0.6510386, -0.75303614, 0.13872693, 0.74041075, 0.65768296, 0.985733, -0.16715488, -0.019742716, 0, 3.1788688, 11.897)
+shadow_enabled = true
+
+[node name="Bg" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 1, 0, 0, -6.4392138)
+mesh = SubResource("QuadMesh_imku0")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_wlxy5")
+
+[node name="Solid" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(100, 0, 0, 0, 10, 0, 0, 0, 10, 0, -5.5704765, 0)
+mesh = SubResource("BoxMesh_3v7ru")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_tcnuu")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Solid"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Solid/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0, 0)
+shape = SubResource("BoxShape3D_jsk3o")
+
+[node name="Solid2" type="MeshInstance3D" parent="Level"]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 5.2190037, -0.22055626, 0)
+mesh = SubResource("BoxMesh_3v7ru")
+skeleton = NodePath("../Solid")
+surface_material_override/0 = SubResource("StandardMaterial3D_4arys")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Level/Solid2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Level/Solid2/StaticBody3D"]
+shape = SubResource("BoxShape3D_jsk3o")
