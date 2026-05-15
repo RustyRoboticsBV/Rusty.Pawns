@@ -1,4 +1,4 @@
-[gd_scene load_steps=45 format=3 uid="uid://dyprs8yt6tlxj"]
+[gd_scene load_steps=48 format=3 uid="uid://dyprs8yt6tlxj"]
 
 [ext_resource type="Script" uid="uid://qln580dj5gv5" path="res://Scripts/BasicActions/SimplePlayerController.cs" id="1_a0tk4"]
 [ext_resource type="Script" uid="uid://kl8e2pf3srga" path="res://Scripts/Core/Pawn/Pawn.cs" id="2_r3fl7"]
@@ -26,6 +26,7 @@
 [ext_resource type="Script" uid="uid://dxadkn3jxjhu0" path="res://Scripts/BasicActions/Conditions/Logical/AndCondition.cs" id="18_jsnrv"]
 [ext_resource type="Script" uid="uid://cy32h6ng2fkwq" path="res://Scripts/BasicActions/Conditions/Logical/NotCondition.cs" id="19_lggff"]
 [ext_resource type="Script" uid="uid://ckkc3d17vhov2" path="res://Scripts/BasicActions/Conditions/Movement/HasSpeedCondition.cs" id="20_s0gvp"]
+[ext_resource type="Script" uid="uid://b7tkg4vcojs2h" path="res://Scripts/BasicActions/Conditions/Collision/DistanceToWallCondition.cs" id="20_vmvb8"]
 [ext_resource type="Script" uid="uid://um220quwve4g" path="res://Scripts/BasicActions/Triggers/JumpTrigger.cs" id="22_dhlwf"]
 [ext_resource type="Script" uid="uid://cj5q0k716k3he" path="res://Scripts/BasicActions/Effects/JumpEffect.cs" id="23_5t8nk"]
 [ext_resource type="Script" uid="uid://c6ax1orl88l5" path="res://Scripts/BasicActions/Effects/EffectGroup.cs" id="23_nu31w"]
@@ -33,6 +34,8 @@
 [ext_resource type="Script" uid="uid://8q0xn247pvp1" path="res://Scripts/BasicActions/Triggers/GrabTrigger.cs" id="28_ype4i"]
 [ext_resource type="Script" uid="uid://cjkg33ak3pmk8" path="res://Scripts/BasicActions/Effects/GrabEffect.cs" id="29_riyl1"]
 [ext_resource type="Script" uid="uid://bwk5acjtge1wg" path="res://Scripts/BasicActions/Effects/GrabReleaseEffect.cs" id="30_pb8dk"]
+[ext_resource type="Script" uid="uid://dol20xlps5joy" path="res://Scripts/BasicActions/Triggers/SprintTrigger.cs" id="32_2mu51"]
+[ext_resource type="Script" uid="uid://dsltatofiap1o" path="res://Scripts/BasicActions/Effects/ToggleEffect.cs" id="33_vmvb8"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_i5arm"]
 size = Vector3(1, 2, 1)
@@ -99,17 +102,38 @@ metadata/_custom_type_script = "uid://c6d8wnkdq05kb"
 
 [node name="GroundWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("4_r3fl7")
+TopSpeed = 17.0
 AccelerationTime = 0.032
 DecelerationTime = 0.048
 TurnTime = 0.048
-Conditions = [NodePath("../../../Conditions/IsGrounded")]
+Conditions = [NodePath("../../../Conditions/IsGrounded"), NodePath("../../../Conditions/IsSprinting/IsNotSprinting")]
 metadata/_custom_type_script = "uid://b04sx7q872ytp"
 
 [node name="AirWalk" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("4_r3fl7")
+TopSpeed = 16.0
 AccelerationTime = 0.048
 DecelerationTime = 0.064
-Conditions = [NodePath("../../../Conditions/IsAerial")]
+Conditions = [NodePath("../../../Conditions/IsAerial"), NodePath("../../../Conditions/IsSprinting/IsNotSprinting")]
+metadata/_custom_type_script = "uid://b04sx7q872ytp"
+
+[node name="GroundSprint" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("4_r3fl7")
+StartSpeed = 10.0
+TopSpeed = 28.0
+AccelerationTime = 0.032
+DecelerationTime = 0.1
+TurnTime = 0.2
+Conditions = [NodePath("../../../Conditions/IsGrounded"), NodePath("../../../Conditions/IsSprinting")]
+metadata/_custom_type_script = "uid://b04sx7q872ytp"
+
+[node name="AirSprint" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Walk" node_paths=PackedStringArray("Conditions")]
+script = ExtResource("4_r3fl7")
+StartSpeed = 10.0
+TopSpeed = 27.0
+AccelerationTime = 0.048
+DecelerationTime = 0.1
+Conditions = [NodePath("../../../Conditions/IsAerial"), NodePath("../../../Conditions/IsSprinting")]
 metadata/_custom_type_script = "uid://b04sx7q872ytp"
 
 [node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
@@ -160,7 +184,7 @@ metadata/_custom_type_script = "uid://u87cgnbicg4k"
 
 [node name="Climb" type="Node3D" parent="SimplePlayerController/Pawn/Movement" node_paths=PackedStringArray("Conditions")]
 script = ExtResource("11_i0g27")
-Conditions = [NodePath("../../Conditions/IsGrabbingWall")]
+Conditions = [NodePath("../../Conditions/IsGrabbingWall"), NodePath("../../Conditions/IsFacingWall")]
 metadata/_custom_type_script = "uid://b42gml4r3m48x"
 
 [node name="ClimbProperties" type="Node3D" parent="SimplePlayerController/Pawn/Movement/Climb"]
@@ -205,9 +229,22 @@ metadata/_custom_type_script = "uid://dy24l112tlu5r"
 script = ExtResource("17_vxd74")
 metadata/_custom_type_script = "uid://be35t76fr3i1r"
 
+[node name="InGrabWallRange" type="Node3D" parent="SimplePlayerController/Pawn/Conditions"]
+script = ExtResource("20_vmvb8")
+metadata/_custom_type_script = "uid://b7tkg4vcojs2h"
+
 [node name="IsGrabbing" type="Node3D" parent="SimplePlayerController/Pawn/Conditions"]
 script = ExtResource("16_jsnrv")
 metadata/_custom_type_script = "uid://b5kc1ygpwwjrw"
+
+[node name="IsSprinting" type="Node3D" parent="SimplePlayerController/Pawn/Conditions"]
+script = ExtResource("16_jsnrv")
+metadata/_custom_type_script = "uid://b5kc1ygpwwjrw"
+
+[node name="IsNotSprinting" type="Node3D" parent="SimplePlayerController/Pawn/Conditions/IsSprinting" node_paths=PackedStringArray("Condition")]
+script = ExtResource("19_lggff")
+Condition = NodePath("..")
+metadata/_custom_type_script = "uid://cy32h6ng2fkwq"
 
 [node name="IsWalking" type="Node3D" parent="SimplePlayerController/Pawn/Conditions" node_paths=PackedStringArray("Movement")]
 script = ExtResource("20_s0gvp")
@@ -241,6 +278,7 @@ metadata/_custom_type_script = "uid://cxkdxsl31ur4a"
 [node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("IsGroundedCondition", "CancelEffect", "InvokeEffect")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
 script = ExtResource("22_dhlwf")
+CoyoteTime = 0.1
 IsGroundedCondition = NodePath("../../Conditions/IsGrounded")
 CancelEffect = NodePath("Cancel")
 InvokeEffect = NodePath("Invoke")
@@ -250,7 +288,7 @@ metadata/_custom_type_script = "uid://um220quwve4g"
 script = ExtResource("23_nu31w")
 metadata/_custom_type_script = "uid://c6ax1orl88l5"
 
-[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump/Invoke" node_paths=PackedStringArray("Action")]
+[node name="Jump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump/Invoke" node_paths=PackedStringArray("Action")]
 script = ExtResource("23_5t8nk")
 Action = NodePath("../../../../Movement/Jump")
 metadata/_custom_type_script = "uid://cj5q0k716k3he"
@@ -259,28 +297,66 @@ metadata/_custom_type_script = "uid://cj5q0k716k3he"
 script = ExtResource("23_nu31w")
 metadata/_custom_type_script = "uid://c6ax1orl88l5"
 
-[node name="Action" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump/Cancel" node_paths=PackedStringArray("Action")]
+[node name="CancelJump" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Jump/Cancel" node_paths=PackedStringArray("Action")]
 script = ExtResource("24_j3e5s")
 Action = NodePath("../../../../Movement/Jump")
 metadata/_custom_type_script = "uid://ffydawkn30v2"
 
-[node name="GrabTrigger" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("CancelEffect", "InvokeEffect")]
+[node name="Grab" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("CancelEffect", "InvokeEffect")]
 script = ExtResource("28_ype4i")
-GrabDistance = 50.0
-CancelEffect = NodePath("GrabReleaseEffect")
-InvokeEffect = NodePath("GrabEffect")
+GrabDistance = 1.0
+CancelEffect = NodePath("Cancel")
+InvokeEffect = NodePath("Invoke")
 metadata/_custom_type_script = "uid://8q0xn247pvp1"
 
-[node name="GrabEffect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/GrabTrigger" node_paths=PackedStringArray("Action")]
+[node name="Invoke" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Grab"]
+script = ExtResource("23_nu31w")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
+
+[node name="Grab" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Grab/Invoke" node_paths=PackedStringArray("Action")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
 script = ExtResource("29_riyl1")
-Action = NodePath("../../../Movement/Grab")
+Action = NodePath("../../../../Movement/Grab")
 metadata/_custom_type_script = "uid://cjkg33ak3pmk8"
 
-[node name="GrabReleaseEffect" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/GrabTrigger" node_paths=PackedStringArray("Action")]
+[node name="Toggle" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Grab/Invoke" node_paths=PackedStringArray("Toggle")]
+script = ExtResource("33_vmvb8")
+Toggle = NodePath("../../../../Conditions/IsGrabbing")
+Value = true
+metadata/_custom_type_script = "uid://dsltatofiap1o"
+
+[node name="Cancel" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Grab"]
+script = ExtResource("23_nu31w")
+metadata/_custom_type_script = "uid://c6ax1orl88l5"
+
+[node name="GrabReleas" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Grab/Cancel" node_paths=PackedStringArray("Action")]
 script = ExtResource("30_pb8dk")
-Action = NodePath("../../../Movement/Grab")
+Action = NodePath("../../../../Movement/Grab")
 metadata/_custom_type_script = "uid://bwk5acjtge1wg"
+
+[node name="Toggle" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Grab/Cancel" node_paths=PackedStringArray("Toggle")]
+script = ExtResource("33_vmvb8")
+Toggle = NodePath("../../../../Conditions/IsGrabbing")
+metadata/_custom_type_script = "uid://dsltatofiap1o"
+
+[node name="Sprint" type="Node3D" parent="SimplePlayerController/Pawn/Triggers" node_paths=PackedStringArray("CancelEffect", "InvokeEffect")]
+script = ExtResource("32_2mu51")
+CancelEffect = NodePath("Cancel")
+InvokeEffect = NodePath("Invoke")
+metadata/_custom_type_script = "uid://dol20xlps5joy"
+
+[node name="Invoke" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Sprint" node_paths=PackedStringArray("Toggle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("33_vmvb8")
+Toggle = NodePath("../../../Conditions/IsSprinting")
+Value = true
+metadata/_custom_type_script = "uid://dsltatofiap1o"
+
+[node name="Cancel" type="Node3D" parent="SimplePlayerController/Pawn/Triggers/Sprint" node_paths=PackedStringArray("Toggle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.1788688, 0)
+script = ExtResource("33_vmvb8")
+Toggle = NodePath("../../../Conditions/IsSprinting")
+metadata/_custom_type_script = "uid://dsltatofiap1o"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SimplePlayerController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -288,7 +364,7 @@ mesh = SubResource("BoxMesh_i5arm")
 skeleton = NodePath("../Pawn")
 
 [node name="Camera3D" type="Camera3D" parent="SimplePlayerController"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 11.897)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 11.897)
 environment = SubResource("Environment_cdqbm")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SimplePlayerController/Camera3D"]

@@ -1,7 +1,6 @@
 using Godot;
 
-using Rusty.Pawns;
-using System.Reflection;
+namespace Rusty.Pawns;
 
 [GlobalClass]
 public partial class GrabTrigger : CancelTrigger
@@ -10,6 +9,7 @@ public partial class GrabTrigger : CancelTrigger
     [Export] public float GrabDistance { get; set; } = 0.5f;
 
     /* Private properties. */
+    private bool IsGrabbing { get; set; }
     private bool MustGrab { get; set; }
     private bool MustRelease { get; set; }
 
@@ -36,12 +36,17 @@ public partial class GrabTrigger : CancelTrigger
         if (MustGrab)
         {
             InvokeEffect.Invoke(deltaTime);
+            IsGrabbing = true;
         }
+
+        if (IsGrabbing && Pawn.Front.Distance > GrabDistance)
+            MustRelease = true;
+
         if (MustRelease)
         {
             CancelEffect.Invoke(deltaTime);
             MustRelease = false;
-            MustGrab = false;
+            IsGrabbing = false;
         }
     }
 }

@@ -1,6 +1,6 @@
 using Godot;
 
-using Rusty.Pawns;
+namespace Rusty.Pawns;
 
 [GlobalClass]
 public partial class JumpTrigger : CancelTrigger
